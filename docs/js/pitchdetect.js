@@ -45,8 +45,8 @@ window.onload = function() {
 	var request = new XMLHttpRequest();
 	request.open("GET", "./audio/vocal1.ogg", true);
 	request.responseType = "arraybuffer";
-	request.onload = function() {
-	  audioContext.decodeAudioData( request.response, function(buffer) { 
+	request.onload = () => {
+	  audioContext.decodeAudioData( request.response, (buffer)=> { 
 	    	theBuffer = buffer;
 		} );
 	}

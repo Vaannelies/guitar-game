@@ -6,9 +6,7 @@
         "noUnusedLocals":true,
         "noUnusedParameters":true,
         "sourceMap": true,
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        // "outFile": "/docs/js/main.js",
+        "outFile": "docs/js/main.js",
     },
     "include": [
         "dev/**/*"

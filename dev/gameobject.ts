@@ -1,3 +1,5 @@
+// / <reference path="vector.ts" />
+
 class GameObject extends HTMLElement{
     // Fields
     private static numberOfShips : number = 0
@@ -5,9 +7,9 @@ class GameObject extends HTMLElement{
     private _position       : Vector 
     private speed           : Vector
     private rotation        : number = 0
-    private rotationSpeed   : number = 0
+    // private rotationSpeed   : number = 0
     
-    private counter         : number = 60
+    // private counter         : number = 60
 
     private colors          : string[] = ["Green", "Blue", "Orange", "White", "Black", "Red"]
     private _color          : string   = ""

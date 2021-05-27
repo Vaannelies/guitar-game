@@ -1,8 +1,8 @@
 {
-  "name": "javascript",
+  "name": "guitar-game",
   "version": "1.0.0",
   "description": "",
-  "main": "pitchdetect.js",
+  "main": "js/main.js",
   "directories": {
     "doc": "docs"
   },
