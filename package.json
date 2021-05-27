@@ -1,0 +1,20 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pitchdetect.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "inpm": "^0.1.0",
+    "ts-stopwatch": "^0.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

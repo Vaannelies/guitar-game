@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "es6",
+        "removeComments": true,
+        "noUnusedLocals":true,
+        "noUnusedParameters":true,
+        "sourceMap": true,
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        // "outFile": "/docs/js/main.js",
+    },
+    "include": [
+        "dev/**/*"
+    ]
+}
