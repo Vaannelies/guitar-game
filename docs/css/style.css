@@ -37,6 +37,7 @@ messageboard-component {
     background-color: grey;
     overflow: hidden;
     top: 10px; right: 10px;
+    display: none;
 }
 
 messageboard-component * {

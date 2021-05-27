@@ -8,6 +8,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+class AudioPlayer extends HTMLElement {
+    constructor() {
+        super();
+        this.audio = new Audio('./audio/perfect.mp3');
+    }
+    play() {
+        const startPlayPromise = this.audio.play();
+        if (startPlayPromise !== undefined) {
+            startPlayPromise.then(() => {
+            }).catch(error => {
+                if (error.name === 'NotAllowedError') {
+                    this.play();
+                }
+                else {
+                    console.log("Error: ", error);
+                }
+            });
+        }
+    }
+}
+window.customElements.define("audioplayer-component", AudioPlayer);
 class GameObject extends HTMLElement {
     constructor() {
         super();
@@ -124,18 +145,49 @@ window.customElements.define("captain-component", Captain);
 class Main {
     constructor() {
         this.bullets = [];
+        this.timer = new Timer();
+        const pitchdetect = new PitchDetect();
+        console.log(pitchdetect);
+        pitchdetect.updatePitch();
+        this.createMenu();
+    }
+    createMenu() {
+        const body = document.querySelector('body');
+        const menuContainer = document.createElement("div");
+        menuContainer.setAttribute('style', 'height: 100vh; width: 100vw; z-index: 2; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center');
+        const menu = document.createElement("div");
+        menu.setAttribute('style', 'display: flex; justify-content: center; padding: 10px; flex-direction: column; width: 40vw; height: 40vh; background: white; border-radius: 8px; align-items: center;');
+        const title = document.createElement("h1");
+        title.innerText = 'Are you ready?';
+        title.setAttribute('style', 'font-size: 24px; text-align: center;');
+        const button = document.createElement("button");
+        button.setAttribute('style', 'font-size: 24px; padding: 20px; height: 2em; line-height: 0; background: black; border-radius: 8px; color: white;');
+        button.innerText = "START";
+        body === null || body === void 0 ? void 0 : body.appendChild(menuContainer);
+        menuContainer.appendChild(menu);
+        menu.appendChild(title);
+        menu.appendChild(button);
+        button.addEventListener('click', () => {
+            menuContainer.remove();
+            this.start();
+        });
+    }
+    start() {
+        this.timer.startTimer();
+        const audioPlayer = new AudioPlayer();
+        audioPlayer.play();
         for (let i = 0; i < 10; i++) {
             this.bullets.push(new Bullet());
         }
         this.messageboard = Messageboard.getInstance();
         console.log(this.messageboard);
-        const pitchdetect = new PitchDetect();
-        console.log(pitchdetect);
-        pitchdetect.updatePitch();
         this.gameLoop();
     }
     gameLoop() {
         console.log("yo");
+        if (this.timer.sec == 5) {
+            console.log("het is 5 lol");
+        }
         for (const ship of this.bullets) {
             ship.update();
             for (const otherShip of this.bullets) {
@@ -432,6 +484,60 @@ class PitchDetect extends HTMLElement {
     }
 }
 window.customElements.define("pitchdetect-component", PitchDetect);
+class Timer extends HTMLElement {
+    constructor() {
+        super();
+        this.min = 0;
+        this.sec = 0;
+        this.ms = 0;
+        this.stoptime = true;
+    }
+    startTimer() {
+        if (this.stoptime == true) {
+            this.stoptime = false;
+            this.timerCycle();
+        }
+    }
+    stopTimer() {
+        if (this.stoptime == false) {
+            this.stoptime = true;
+        }
+    }
+    timerCycle() {
+        if (this.stoptime == false) {
+            this.ms = parseInt(this.ms);
+            this.sec = parseInt(this.sec);
+            this.min = parseInt(this.min);
+            this.ms = this.ms + 1;
+            if (this.ms == 60) {
+                this.sec = this.sec + 1;
+                this.ms = 0;
+            }
+            if (this.sec == 60) {
+                this.min = this.min + 1;
+                this.sec = 0;
+                this.ms = 0;
+            }
+            if (this.ms < 10 || this.ms == 0) {
+                this.ms = '0' + this.ms;
+            }
+            if (this.sec < 10 || this.sec == 0) {
+                this.sec = '0' + this.sec;
+            }
+            if (this.min < 10 || this.min == 0) {
+                this.min = '0' + this.min;
+            }
+            setTimeout(() => { this.timerCycle(); }, 10);
+        }
+    }
+    resetTimer() {
+        this.stoptime = true;
+        this.min = 0;
+        this.ms = 0;
+        this.sec = 0;
+    }
+}
+window.customElements.define("timer-component", Timer);
 class Vector {
     constructor(x, y) {
         this._x = 0;

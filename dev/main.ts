@@ -14,6 +14,7 @@ class Main {
 
     private bullets : Bullet[] = []
     private messageboard : Messageboard
+    private timer: Timer
 
 
 
@@ -26,8 +27,45 @@ class Main {
         // this.stopwatch.start();
         // console.log(this.stopwatch.getTime())
         // this.stopwatch.stop();
+        this.timer = new Timer();
+        const pitchdetect: PitchDetect = new PitchDetect();
+        console.log(pitchdetect)
+        pitchdetect.updatePitch()
+
+        this.createMenu();
     
-    
+    }
+
+    createMenu() {
+        
+        const body = document.querySelector('body');
+        const menuContainer = document.createElement("div");
+        menuContainer.setAttribute('style', 'height: 100vh; width: 100vw; z-index: 2; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center');
+        // body?.setAttribute('style', 'display: flex; align-items: center;')
+        const menu = document.createElement("div");
+
+        menu.setAttribute('style', 'display: flex; justify-content: center; padding: 10px; flex-direction: column; width: 40vw; height: 40vh; background: white; border-radius: 8px; align-items: center;');
+        const title = document.createElement("h1");
+        title.innerText = 'Are you ready?'
+        title.setAttribute('style', 'font-size: 24px; text-align: center;');
+        const button = document.createElement("button");
+        button.setAttribute('style', 'font-size: 24px; padding: 20px; height: 2em; line-height: 0; background: black; border-radius: 8px; color: white;')
+        button.innerText = "START";
+        body?.appendChild(menuContainer);
+        menuContainer.appendChild(menu)
+        menu.appendChild(title)
+        menu.appendChild(button)
+        button.addEventListener('click', () => {
+            menuContainer.remove();
+            this.start();
+        })
+    }
+
+    start() {
+
+        this.timer.startTimer();
+        const audioPlayer = new AudioPlayer();
+        audioPlayer.play();
         for (let i = 0; i < 10; i++) {
             this.bullets.push(new Bullet())
         }
@@ -37,16 +75,16 @@ class Main {
         console.log(this.messageboard)
 
         // pitchdetect.toggleLiveInput();
-        const pitchdetect: PitchDetect = new PitchDetect();
-        console.log(pitchdetect)
-        pitchdetect.updatePitch()
+
         this.gameLoop()
-        
     }
     
     gameLoop() {
         console.log("yo")
         // pitchdetect.updatePitch()
+        if(this.timer.sec == 5) {
+            console.log("het is 5 lol");
+        }
       
         for (const ship of this.bullets) {
             ship.update()
