@@ -11,9 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 class AudioPlayer extends HTMLElement {
     constructor() {
         super();
+        this.paused = false;
         this.audio = new Audio('./audio/perfect.mp3');
     }
     play() {
+        this.paused = false;
         const startPlayPromise = this.audio.play();
         if (startPlayPromise !== undefined) {
             startPlayPromise.then(() => {
@@ -26,6 +28,14 @@ class AudioPlayer extends HTMLElement {
                 }
             });
         }
+    }
+    pause() {
+        this.audio.pause();
+        this.paused = true;
+    }
+    stop() {
+        this.audio.pause();
+        this.audio.currentTime = 0;
     }
 }
 window.customElements.define("audioplayer-component", AudioPlayer);
@@ -145,6 +155,7 @@ window.customElements.define("captain-component", Captain);
 class Main {
     constructor() {
         this.bullets = [];
+        this.isPaused = false;
         this.timer = new Timer();
         const pitchdetect = new PitchDetect();
         console.log(pitchdetect);
@@ -168,14 +179,28 @@ class Main {
         menu.appendChild(title);
         menu.appendChild(button);
         button.addEventListener('click', () => {
-            menuContainer.remove();
+            menu.remove();
             this.start();
+        });
+        const pauseButton = document.createElement("button");
+        pauseButton.innerText = "PAUSE";
+        pauseButton.setAttribute('style', 'position: absolute; top: 10px; font-size: 14px; padding: 8px; background: black; border-radius: 8px; color: white;');
+        menuContainer.appendChild(pauseButton);
+        pauseButton.addEventListener('click', () => {
+            this.isPaused = !this.isPaused;
+            if (this.audioPlayer.paused) {
+                this.audioPlayer.play();
+                this.gameLoop();
+            }
+            else {
+                this.audioPlayer.pause();
+            }
         });
     }
     start() {
         this.timer.startTimer();
-        const audioPlayer = new AudioPlayer();
-        audioPlayer.play();
+        this.audioPlayer = new AudioPlayer();
+        this.audioPlayer.play();
         for (let i = 0; i < 10; i++) {
             this.bullets.push(new Bullet());
         }
@@ -202,7 +227,10 @@ class Main {
                 }
             }
         }
-        requestAnimationFrame(() => this.gameLoop());
+        console.log(this.isPaused);
+        if (!this.isPaused) {
+            requestAnimationFrame(() => this.gameLoop());
+        }
     }
 }
 window.addEventListener("load", () => new Main());

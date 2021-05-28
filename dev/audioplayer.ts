@@ -1,5 +1,6 @@
 class AudioPlayer extends HTMLElement {
     private audio: HTMLAudioElement;
+    public paused: boolean = false;
 
     constructor() {
         super()
@@ -7,9 +8,10 @@ class AudioPlayer extends HTMLElement {
     }
     
     public play() {
-       const startPlayPromise = this.audio.play();
+        this.paused = false;
+        const startPlayPromise = this.audio.play();
 
-       if(startPlayPromise !== undefined) {
+        if(startPlayPromise !== undefined) {
            startPlayPromise.then(() => {
                // toppie
            }).catch(error => {
@@ -19,7 +21,17 @@ class AudioPlayer extends HTMLElement {
                    console.log("Error: ", error);
                }
            })
-       }
+        }
+    }
+
+    public pause() {
+        this.audio.pause();
+        this.paused = true;
+    }
+
+    public stop() {
+        this.audio.pause();
+        this.audio.currentTime = 0;
     }
 }
 

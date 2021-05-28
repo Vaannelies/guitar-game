@@ -11,10 +11,12 @@
 
 class Main {
     // const Stopwatch = requestAnimationFrame()
-
+    private audioPlayer: AudioPlayer
     private bullets : Bullet[] = []
     private messageboard : Messageboard
     private timer: Timer
+    private isPaused: boolean = false
+
 
 
 
@@ -56,16 +58,32 @@ class Main {
         menu.appendChild(title)
         menu.appendChild(button)
         button.addEventListener('click', () => {
-            menuContainer.remove();
+            menu.remove();
             this.start();
+        })
+
+
+        const pauseButton = document.createElement("button");
+        pauseButton.innerText = "PAUSE";
+        pauseButton.setAttribute('style', 'position: absolute; top: 10px; font-size: 14px; padding: 8px; background: black; border-radius: 8px; color: white;')
+        menuContainer.appendChild(pauseButton)
+        pauseButton.addEventListener('click', () => {
+            this.isPaused = !this.isPaused
+            if(this.audioPlayer.paused) {
+                this.audioPlayer.play();
+                this.gameLoop();
+            } else {
+                this.audioPlayer.pause();
+            }
+            // console.log('paused:', this.isPaused)
         })
     }
 
     start() {
 
         this.timer.startTimer();
-        const audioPlayer = new AudioPlayer();
-        audioPlayer.play();
+        this.audioPlayer = new AudioPlayer();
+        this.audioPlayer.play();
         for (let i = 0; i < 10; i++) {
             this.bullets.push(new Bullet())
         }
@@ -102,8 +120,10 @@ class Main {
                 }
             }
         }
-
-        requestAnimationFrame(() => this.gameLoop())
+        console.log(this.isPaused)
+        if(!this.isPaused) {
+            requestAnimationFrame(() => this.gameLoop())
+        }
     }
 
 
