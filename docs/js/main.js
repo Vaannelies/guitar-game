@@ -225,6 +225,7 @@ class Main {
         this.notes.forEach(note => {
             if (note.time.toString() == (this.timer.sec + "." + this.timer.ms).toString()) {
                 console.log(note.title);
+                this.bullets.push(new Bullet());
             }
         });
         for (const ship of this.bullets) {

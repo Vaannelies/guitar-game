@@ -122,6 +122,7 @@ class Main {
                 // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
             if(note.time.toString() == (this.timer.sec+"."+this.timer.ms).toString()) {
                 console.log(note.title);
+                this.bullets.push(new Bullet())
             }
         })
       
