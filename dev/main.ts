@@ -69,11 +69,13 @@ class Main {
         menuContainer.appendChild(pauseButton)
         pauseButton.addEventListener('click', () => {
             this.isPaused = !this.isPaused
-            if(this.audioPlayer.paused) {
+            if(this.isPaused) {
+                this.audioPlayer.pause();
+                this.timer.stopTimer();
+            } else {
                 this.audioPlayer.play();
                 this.gameLoop();
-            } else {
-                this.audioPlayer.pause();
+                this.timer.startTimer();
             }
             // console.log('paused:', this.isPaused)
         })
@@ -98,7 +100,6 @@ class Main {
     }
     
     gameLoop() {
-        console.log("yo")
         // pitchdetect.updatePitch()
         if(this.timer.sec == 5) {
             console.log("het is 5 lol");
@@ -120,7 +121,6 @@ class Main {
                 }
             }
         }
-        console.log(this.isPaused)
         if(!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop())
         }

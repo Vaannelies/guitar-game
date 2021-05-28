@@ -1,6 +1,5 @@
 class AudioPlayer extends HTMLElement {
     private audio: HTMLAudioElement;
-    public paused: boolean = false;
 
     constructor() {
         super()
@@ -8,7 +7,6 @@ class AudioPlayer extends HTMLElement {
     }
     
     public play() {
-        this.paused = false;
         const startPlayPromise = this.audio.play();
 
         if(startPlayPromise !== undefined) {
@@ -26,7 +24,6 @@ class AudioPlayer extends HTMLElement {
 
     public pause() {
         this.audio.pause();
-        this.paused = true;
     }
 
     public stop() {

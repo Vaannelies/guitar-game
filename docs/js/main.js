@@ -11,11 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 class AudioPlayer extends HTMLElement {
     constructor() {
         super();
-        this.paused = false;
         this.audio = new Audio('./audio/perfect.mp3');
     }
     play() {
-        this.paused = false;
         const startPlayPromise = this.audio.play();
         if (startPlayPromise !== undefined) {
             startPlayPromise.then(() => {
@@ -31,7 +29,6 @@ class AudioPlayer extends HTMLElement {
     }
     pause() {
         this.audio.pause();
-        this.paused = true;
     }
     stop() {
         this.audio.pause();
@@ -188,12 +185,14 @@ class Main {
         menuContainer.appendChild(pauseButton);
         pauseButton.addEventListener('click', () => {
             this.isPaused = !this.isPaused;
-            if (this.audioPlayer.paused) {
-                this.audioPlayer.play();
-                this.gameLoop();
+            if (this.isPaused) {
+                this.audioPlayer.pause();
+                this.timer.stopTimer();
             }
             else {
-                this.audioPlayer.pause();
+                this.audioPlayer.play();
+                this.gameLoop();
+                this.timer.startTimer();
             }
         });
     }
@@ -209,7 +208,6 @@ class Main {
         this.gameLoop();
     }
     gameLoop() {
-        console.log("yo");
         if (this.timer.sec == 5) {
             console.log("het is 5 lol");
         }
@@ -227,7 +225,6 @@ class Main {
                 }
             }
         }
-        console.log(this.isPaused);
         if (!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop());
         }
