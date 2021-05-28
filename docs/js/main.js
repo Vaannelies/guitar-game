@@ -197,20 +197,36 @@ class Main {
         });
     }
     start() {
-        this.timer.startTimer();
-        this.audioPlayer = new AudioPlayer();
-        this.audioPlayer.play();
-        for (let i = 0; i < 10; i++) {
-            this.bullets.push(new Bullet());
-        }
-        this.messageboard = Messageboard.getInstance();
-        console.log(this.messageboard);
-        this.gameLoop();
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.fetchNotesForSong();
+            console.log("notes", this.notes);
+            this.timer.startTimer();
+            this.audioPlayer = new AudioPlayer();
+            this.audioPlayer.play();
+            for (let i = 0; i < 10; i++) {
+                this.bullets.push(new Bullet());
+            }
+            this.messageboard = Messageboard.getInstance();
+            console.log(this.messageboard);
+            this.gameLoop();
+        });
+    }
+    fetchNotesForSong() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield fetch("notes/perfect.json")
+                .then(response => response.json())
+                .then(json => { this.notes = json.notes; });
+        });
     }
     gameLoop() {
         if (this.timer.sec == 5) {
             console.log("het is 5 lol");
         }
+        this.notes.forEach(note => {
+            if (note.time.toString() == (this.timer.sec + "." + this.timer.ms).toString()) {
+                console.log(note.title);
+            }
+        });
         for (const ship of this.bullets) {
             ship.update();
             for (const otherShip of this.bullets) {

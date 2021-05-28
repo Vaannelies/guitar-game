@@ -2,6 +2,7 @@
 // / <reference path="pitchdetect.ts"/>
 
 // import PitchDetect from "./pitchdetect";
+// import * as data from '../docs/notes/perfect.json'
 
 // import { Stopwatch } from "ts-stopwatch";
 // import PitchDetect from './pitchdetect';
@@ -16,6 +17,7 @@ class Main {
     private messageboard : Messageboard
     private timer: Timer
     private isPaused: boolean = false
+    private notes: {title: string, time: number}[]
 
 
 
@@ -35,6 +37,7 @@ class Main {
         pitchdetect.updatePitch()
 
         this.createMenu();
+        
     
     }
 
@@ -81,7 +84,10 @@ class Main {
         })
     }
 
-    start() {
+    async start() {
+        await this.fetchNotesForSong();
+        console.log("notes", this.notes)
+
 
         this.timer.startTimer();
         this.audioPlayer = new AudioPlayer();
@@ -99,11 +105,25 @@ class Main {
         this.gameLoop()
     }
     
+    async fetchNotesForSong() {
+        await fetch("notes/perfect.json")
+            .then(response => response.json())
+            .then(json => {this.notes = json.notes });
+    }
+
     gameLoop() {
         // pitchdetect.updatePitch()
         if(this.timer.sec == 5) {
             console.log("het is 5 lol");
         }
+
+        this.notes.forEach(note => {
+                // console.log('time', note.time.toString())
+                // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
+            if(note.time.toString() == (this.timer.sec+"."+this.timer.ms).toString()) {
+                console.log(note.title);
+            }
+        })
       
         for (const ship of this.bullets) {
             ship.update()
@@ -125,6 +145,7 @@ class Main {
             requestAnimationFrame(() => this.gameLoop())
         }
     }
+
 
 
 
