@@ -18,7 +18,7 @@ class Main {
     private timer: Timer
     private isPaused: boolean = false
     private notes: {title: string, time: number}[]
-
+    private bar: Bar
 
 
 
@@ -35,6 +35,10 @@ class Main {
         const pitchdetect: PitchDetect = new PitchDetect();
         console.log(pitchdetect)
         pitchdetect.updatePitch()
+
+        this.bar = new Bar();
+        console.log(this.bar)
+
 
         this.createMenu();
         
@@ -92,9 +96,9 @@ class Main {
         this.timer.startTimer();
         this.audioPlayer = new AudioPlayer();
         this.audioPlayer.play();
-        for (let i = 0; i < 10; i++) {
-            this.bullets.push(new Bullet())
-        }
+        // for (let i = 0; i < 10; i++) {
+        //     this.bullets.push(new Bullet())
+        // }
    
         // Eventueel Messageboard aanmaken zodat deze zichtbaar wordt?
         this.messageboard = Messageboard.getInstance()
@@ -122,16 +126,17 @@ class Main {
                 // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
             if(note.time.toString() == (this.timer.sec+"."+this.timer.ms).toString()) {
                 console.log(note.title);
-                this.bullets.push(new Bullet())
+                this.bullets.push(new Bullet(note.title))
             }
         })
       
+        // G# D# F G# C A# C A# G# C A# C C C G# G# G# G# A# C A# G G# G C A# G# C A# G# D# C A# G# G#
         for (const ship of this.bullets) {
             ship.update()
 
             for (const otherShip of this.bullets) {
                 if(ship !== otherShip) {
-                    if(ship.hasCollision(otherShip)) {
+                    if(ship.hasCollision(this.bar)) {
                         ship.hit = true
                         // break inner loop to prevent overwriting the hit
                         break

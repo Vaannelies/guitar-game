@@ -38,13 +38,15 @@ class AudioPlayer extends HTMLElement {
 window.customElements.define("audioplayer-component", AudioPlayer);
 class GameObject extends HTMLElement {
     constructor() {
+        var _a, _b;
         super();
         this.rotation = 0;
         this.colors = ["Green", "Blue", "Orange", "White", "Black", "Red"];
         this._color = "";
-        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, Math.random() * window.innerHeight - this.clientHeight);
-        this.speed = new Vector(2, 4);
+        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, (window.innerHeight - ((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.height) - 500));
+        this.speed = 5;
         this.rotation = 90;
+        console.log((window.innerHeight - ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.height)));
         this.createShip();
     }
     get position() { return this._position; }
@@ -57,11 +59,14 @@ class GameObject extends HTMLElement {
             GameObject.numberOfShips = 1;
         this.style.backgroundImage = `url(images/ship${GameObject.numberOfShips + 3}.png)`;
         this._color = this.colors[GameObject.numberOfShips - 1];
+        this.moveBullet();
+    }
+    moveBullet() {
+        this._position.y += this.speed;
+        this.draw();
+        setTimeout(() => { this.moveBullet(); }, 10);
     }
     update() {
-        this._position.x += Math.cos(this.degToRad(this.rotation)) * this.speed.x;
-        this._position.y += Math.sin(this.degToRad(this.rotation)) * this.speed.y;
-        this.draw();
     }
     draw() {
         this.style.transform = `translate(${this._position.x}px, ${this._position.y}px) rotate(${this.rotation}deg)`;
@@ -70,19 +75,49 @@ class GameObject extends HTMLElement {
         return degrees * Math.PI / 180;
     }
     hasCollision(ship) {
-        return (ship._position.x < this._position.x + this.clientWidth &&
-            ship._position.x + ship.clientWidth > this._position.x &&
-            ship._position.y < this._position.y + this.clientHeight &&
+        return (ship._position.y < this._position.y + this.clientHeight &&
             ship._position.y + ship.clientHeight > this._position.y);
     }
 }
 GameObject.numberOfShips = 0;
-class Bullet extends GameObject {
+class Bar extends HTMLElement {
     constructor() {
+        var _a;
         super();
         this.numberOfHits = 0;
         this._hit = false;
         this.previousHit = false;
+        const bar = document.createElement('div');
+        bar.setAttribute('id', 'bar');
+        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: grey; height: 40px; z-index: -1;');
+        (_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.appendChild(bar);
+        this._position = new Vector(0, window.innerHeight);
+    }
+    set hit(value) { this._hit = value; }
+    update() {
+        this.checkCollision();
+        this.captain.update();
+        super.update();
+    }
+    checkCollision() {
+        if (this._hit && !this.previousHit) {
+            this.captain.onCollision(++this.numberOfHits);
+            let times = this.numberOfHits == 1 ? "time" : "times";
+        }
+        this.previousHit = this._hit;
+    }
+}
+window.customElements.define("bar-component", Bar);
+class Bullet extends GameObject {
+    constructor(note) {
+        super();
+        this.numberOfHits = 0;
+        this._hit = false;
+        this.previousHit = false;
+        this.note = note;
+        const banner = document.createElement('span');
+        banner.innerHTML = this.note;
+        this.appendChild(banner);
         this.captain = new Captain(this);
     }
     set hit(value) { this._hit = value; }
@@ -157,6 +192,8 @@ class Main {
         const pitchdetect = new PitchDetect();
         console.log(pitchdetect);
         pitchdetect.updatePitch();
+        this.bar = new Bar();
+        console.log(this.bar);
         this.createMenu();
     }
     createMenu() {
@@ -203,9 +240,6 @@ class Main {
             this.timer.startTimer();
             this.audioPlayer = new AudioPlayer();
             this.audioPlayer.play();
-            for (let i = 0; i < 10; i++) {
-                this.bullets.push(new Bullet());
-            }
             this.messageboard = Messageboard.getInstance();
             console.log(this.messageboard);
             this.gameLoop();
@@ -225,14 +259,14 @@ class Main {
         this.notes.forEach(note => {
             if (note.time.toString() == (this.timer.sec + "." + this.timer.ms).toString()) {
                 console.log(note.title);
-                this.bullets.push(new Bullet());
+                this.bullets.push(new Bullet(note.title));
             }
         });
         for (const ship of this.bullets) {
             ship.update();
             for (const otherShip of this.bullets) {
                 if (ship !== otherShip) {
-                    if (ship.hasCollision(otherShip)) {
+                    if (ship.hasCollision(this.bar)) {
                         ship.hit = true;
                         break;
                     }
@@ -528,11 +562,14 @@ class PitchDetect extends HTMLElement {
 window.customElements.define("pitchdetect-component", PitchDetect);
 class Timer extends HTMLElement {
     constructor() {
+        var _a;
         super();
         this.min = 0;
         this.sec = 0;
         this.ms = 0;
         this.stoptime = true;
+        this.timer = document.createElement('div');
+        (_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.appendChild(this.timer);
     }
     startTimer() {
         if (this.stoptime == true) {
@@ -569,6 +606,7 @@ class Timer extends HTMLElement {
             if (this.min < 10 || this.min == 0) {
                 this.min = '0' + this.min;
             }
+            this.timer.innerHTML = this.min + ':' + this.sec + ':' + this.ms;
             setTimeout(() => { this.timerCycle(); }, 10);
         }
     }

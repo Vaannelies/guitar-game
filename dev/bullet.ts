@@ -8,13 +8,17 @@ class Bullet extends GameObject {
     private _hit: boolean = false
     
     private previousHit     : boolean = false
+    private note: string
 
     // Properties
     public set hit(value: boolean)  { this._hit = value     }
 
-    constructor() {
+    constructor(note: string) {
         super()
-
+        this.note = note;
+        const banner = document.createElement('span')
+        banner.innerHTML = this.note;
+        this.appendChild(banner)
         this.captain = new Captain(this)
     }
 

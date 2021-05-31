@@ -5,10 +5,12 @@ class Timer extends HTMLElement {
     public sec: any = 0;
     public ms: any = 0;
     public stoptime: boolean = true;
+    private timer: HTMLElement;
 
     constructor() {
         super()
-        // this.timer = document.getElementById('stopwatch');
+        this.timer = document.createElement('div')
+        document.querySelector('body')?.appendChild(this.timer)
     }
 
     startTimer() {
@@ -51,7 +53,7 @@ class Timer extends HTMLElement {
         this.min = '0' + this.min;
         }
 
-        // this.timer.innerHTML = this.min + ':' + this.sec + ':' + this.ms;
+        this.timer.innerHTML = this.min + ':' + this.sec + ':' + this.ms;
         // console.log( this.min + ':' + this.sec + ':' + this.ms);
         setTimeout(() => {this.timerCycle()}, 10);
     }
