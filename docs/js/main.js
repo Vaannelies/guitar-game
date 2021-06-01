@@ -48,7 +48,7 @@ class GameObject extends HTMLElement {
         console.log('windowinnerheight', window.innerHeight);
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, this.clientHeight);
         this.speed = (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) / 40);
-        this.rotation = 90;
+        this.rotation = 0;
         console.log(document.getElementById('bar').getBoundingClientRect());
         this.createShip();
     }
@@ -60,7 +60,13 @@ class GameObject extends HTMLElement {
         GameObject.numberOfShips++;
         if (GameObject.numberOfShips > 6)
             GameObject.numberOfShips = 1;
-        this.style.backgroundImage = `url(images/ship${GameObject.numberOfShips + 3}.png)`;
+        this.style.backgroundColor = "white";
+        this.style.height = "10vh";
+        this.style.minHeight = "40px";
+        this.style.width = "10vh";
+        this.style.minWidth = "40px";
+        this.style.borderRadius = "100px";
+        this.style.boxShadow = "0 0 50px 5px blue";
         this._color = this.colors[GameObject.numberOfShips - 1];
         this.moveBullet();
     }
@@ -100,12 +106,10 @@ class Bar extends HTMLElement {
     set hit(value) { this._hit = value; }
     update() {
         this.checkCollision();
-        this.captain.update();
         super.update();
     }
     checkCollision() {
         if (this._hit && !this.previousHit) {
-            this.captain.onCollision(++this.numberOfHits);
             let times = this.numberOfHits == 1 ? "time" : "times";
         }
         this.previousHit = this._hit;
@@ -119,21 +123,21 @@ class Bullet extends GameObject {
         this._hit = false;
         this.previousHit = false;
         this.note = note;
+        this.style.display = "flex";
+        this.style.justifyContent = "center";
+        this.style.alignItems = "center";
         const banner = document.createElement('span');
         banner.innerHTML = this.note;
         this.appendChild(banner);
-        this.captain = new Captain(this);
         console.log(note);
     }
     set hit(value) { this._hit = value; }
     update() {
         this.checkCollision();
-        this.captain.update();
         super.update();
     }
     checkCollision() {
         if (this._hit && !this.previousHit) {
-            this.captain.onCollision(++this.numberOfHits);
             let times = this.numberOfHits == 1 ? "time" : "times";
             console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
             Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
@@ -165,40 +169,13 @@ class Messageboard extends HTMLElement {
 }
 window.addEventListener("load", () => Messageboard.getInstance());
 window.customElements.define("messageboard-component", Messageboard);
-class Captain extends HTMLElement {
-    constructor(ship) {
-        super();
-        this.ship = ship;
-        let game = document.getElementsByTagName("game")[0];
-        game.appendChild(this);
-    }
-    update() {
-        let x = this.ship.position.x + this.ship.clientWidth / 2;
-        let y = this.ship.position.y;
-        this.style.transform = `translate(${x}px, ${y}px) rotate(${0}deg)`;
-    }
-    onCollision(numberOfHits) {
-        if (numberOfHits == 1) {
-            this.style.backgroundImage = `url(images/emote_alert.png)`;
-            console.log(`Captain of ${this.ship.color} pirateship WOKE UP!`);
-            Messageboard.getInstance().addMessage(`Captain of ${this.ship.color} pirateship WOKE UP!`);
-        }
-        else if (numberOfHits == 7) {
-            this.style.backgroundImage = `url(images/emote_faceAngry.png)`;
-            console.log(`Captain of ${this.ship.color} pirateship got ANGRY!`);
-            Messageboard.getInstance().addMessage(`Captain of ${this.ship.color} pirateship got ANGRY!`);
-        }
-    }
-}
-window.customElements.define("captain-component", Captain);
 class Main {
     constructor() {
         this.bullets = [];
         this.isPaused = false;
         this.timer = new Timer();
-        const pitchdetect = new PitchDetect();
-        console.log(pitchdetect);
-        pitchdetect.updatePitch();
+        this.pitchdetect = new PitchDetect();
+        this.pitchdetect.updatePitch();
         this.bar = new Bar();
         console.log(this.bar);
         this.createMenu();
@@ -260,6 +237,7 @@ class Main {
         });
     }
     gameLoop() {
+        this.pitchdetect.updatePitch();
         if (this.timer.sec == 5) {
             console.log("het is 5 lol");
         }
@@ -291,6 +269,7 @@ class Main {
                 if (ship !== otherShip) {
                     if (ship.hasCollision(this.bar)) {
                         ship.hit = true;
+                        ship.style.backgroundColor = "#e2eaff";
                         console.log(ship.note, this.timer.sec, ":", this.timer.ms);
                         break;
                     }
@@ -333,40 +312,6 @@ class PitchDetect extends HTMLElement {
             });
         };
         request.send();
-        this.detectorElem = document.getElementById("detector");
-        this.canvasElem = document.getElementById("output");
-        this.DEBUGCANVAS = document.getElementById("waveform");
-        if (this.DEBUGCANVAS) {
-            this.waveCanvas = this.DEBUGCANVAS.getContext("2d");
-            this.waveCanvas.strokeStyle = "black";
-            this.waveCanvas.lineWidth = 1;
-        }
-        this.pitchElem = document.getElementById("pitch");
-        this.noteElem = document.getElementById("note");
-        this.detuneElem = document.getElementById("detune");
-        this.detuneAmount = document.getElementById("detune_amt");
-        this.detectorElem.ondragenter = () => {
-            this.classList.add("droptarget");
-            return false;
-        };
-        this.detectorElem.ondragleave = () => { this.classList.remove("droptarget"); return false; };
-        this.detectorElem.ondrop = (e) => {
-            this.classList.remove("droptarget");
-            e.preventDefault();
-            this.theBuffer = null;
-            var reader = new FileReader();
-            reader.onload = (event) => {
-                var _a;
-                (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.decodeAudioData(event.target.result, (buffer) => {
-                    this.theBuffer = buffer;
-                }, () => { alert("error loading!"); });
-            };
-            reader.onerror = () => {
-                alert("Error: " + reader.error);
-            };
-            reader.readAsArrayBuffer(e.dataTransfer.files[0]);
-            return false;
-        };
         this.toggleLiveInput();
         console.log("liveinput)");
     }
@@ -378,6 +323,8 @@ class PitchDetect extends HTMLElement {
             try {
                 navigator.getUserMedia =
                     navigator.getUserMedia;
+                (navigator === null || navigator === void 0 ? void 0 : navigator.webkitGetUserMedia) ||
+                    (navigator === null || navigator === void 0 ? void 0 : navigator.mozGetUserMedia);
                 yield navigator.mediaDevices.getUserMedia(dictionary)
                     .then((res) => {
                     console.log(res);
@@ -397,28 +344,6 @@ class PitchDetect extends HTMLElement {
         this.mediaStreamSource.connect(this.analyser);
         this.updatePitch();
     }
-    toggleOscillator() {
-        var _a, _b, _c;
-        if (this.isPlaying) {
-            this.sourceNode.stop(0);
-            this.sourceNode = null;
-            this.analyser = null;
-            this.isPlaying = false;
-            if (!window.cancelAnimationFrame)
-                window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame(this.rafID);
-            return "play oscillator";
-        }
-        this.sourceNode = (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.createOscillator();
-        this.analyser = (_b = this.audioContext) === null || _b === void 0 ? void 0 : _b.createAnalyser();
-        this.analyser.fftSize = 2048;
-        this.sourceNode.connect(this.analyser);
-        this.analyser.connect((_c = this.audioContext) === null || _c === void 0 ? void 0 : _c.destination);
-        this.sourceNode.start(0);
-        this.isPlaying = true;
-        this.updatePitch();
-        return "stop";
-    }
     toggleLiveInput() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("toggle");
@@ -427,9 +352,6 @@ class PitchDetect extends HTMLElement {
                 this.sourceNode = null;
                 this.analyser = null;
                 this.isPlaying = false;
-                if (!window.cancelAnimationFrame)
-                    window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-                window.cancelAnimationFrame(this.rafID);
             }
             this.getUserMedia({
                 "audio": {
@@ -443,30 +365,6 @@ class PitchDetect extends HTMLElement {
                 },
             });
         });
-    }
-    togglePlayback() {
-        var _a, _b, _c;
-        if (this.isPlaying) {
-            this.sourceNode.stop(0);
-            this.sourceNode = null;
-            this.analyser = null;
-            this.isPlaying = false;
-            if (!window.cancelAnimationFrame)
-                window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame(this.rafID);
-            return "start";
-        }
-        this.sourceNode = (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.createBufferSource();
-        this.sourceNode.buffer = this.theBuffer;
-        this.sourceNode.loop = true;
-        this.analyser = (_b = this.audioContext) === null || _b === void 0 ? void 0 : _b.createAnalyser();
-        this.analyser.fftSize = 2048;
-        this.sourceNode.connect(this.analyser);
-        this.analyser.connect((_c = this.audioContext) === null || _c === void 0 ? void 0 : _c.destination);
-        this.sourceNode.start(0);
-        this.isPlaying = true;
-        this.updatePitch();
-        return "stop";
     }
     noteFromPitch(frequency) {
         var noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
@@ -529,58 +427,20 @@ class PitchDetect extends HTMLElement {
             this.analyser.getFloatTimeDomainData(this.buf);
         }
         let ac = this.autoCorrelate(this.buf, (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.sampleRate);
-        if (this.DEBUGCANVAS) {
-            this.waveCanvas.clearRect(0, 0, 512, 256);
-            this.waveCanvas.strokeStyle = "red";
-            this.waveCanvas.beginPath();
-            this.waveCanvas.moveTo(0, 0);
-            this.waveCanvas.lineTo(0, 256);
-            this.waveCanvas.moveTo(128, 0);
-            this.waveCanvas.lineTo(128, 256);
-            this.waveCanvas.moveTo(256, 0);
-            this.waveCanvas.lineTo(256, 256);
-            this.waveCanvas.moveTo(384, 0);
-            this.waveCanvas.lineTo(384, 256);
-            this.waveCanvas.moveTo(512, 0);
-            this.waveCanvas.lineTo(512, 256);
-            this.waveCanvas.stroke();
-            this.waveCanvas.strokeStyle = "black";
-            this.waveCanvas.beginPath();
-            this.waveCanvas.moveTo(0, this.buf[0]);
-            for (var i = 1; i < 512; i++) {
-                this.waveCanvas.lineTo(i, 128 + (this.buf[i] * 128));
-            }
-            this.waveCanvas.stroke();
-        }
         if (ac == -1) {
-            this.detectorElem.className = "vague";
-            this.pitchElem.innerText = "--";
-            this.noteElem.innerText = "-";
-            this.detuneElem.className = "";
-            this.detuneAmount.innerText = "--";
         }
         else {
-            this.detectorElem.className = "confident";
             let pitch = ac;
-            this.pitchElem.innerText = Math.round(pitch);
             let note = this.noteFromPitch(pitch);
-            this.noteElem.innerHTML = this.noteStrings[note % 12];
             let detune = this.centsOffFromPitch(pitch, note);
             if (detune == 0) {
-                this.detuneElem.className = "";
-                this.detuneAmount.innerHTML = "--";
+                console.log('perfect!');
             }
             else {
-                if (detune < 0)
-                    this.detuneElem.className = "flat";
-                else
-                    this.detuneElem.className = "sharp";
-                this.detuneAmount.innerHTML = Math.abs(detune);
+                console.log('detune: ', detune);
             }
+            console.log(pitch, 'hoi', this.noteStrings[note % 12]);
         }
-        if (!window.requestAnimationFrame)
-            window.requestAnimationFrame = window.webkitRequestAnimationFrame;
-        this.rafID = window.requestAnimationFrame(this.updatePitch.bind(this));
     }
 }
 window.customElements.define("pitchdetect-component", PitchDetect);

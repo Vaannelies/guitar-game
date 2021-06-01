@@ -2,7 +2,7 @@
 
 class Bar extends HTMLElement {
     // Fields
-    private captain         : Captain
+    // private captain         : Captain
 
     private numberOfHits    : number = 0
     private _hit: boolean = false
@@ -30,14 +30,14 @@ class Bar extends HTMLElement {
     public update() {
         this.checkCollision()
 
-        this.captain.update()
+        // this.captain.update()
 
         super.update()
     }
 
     private checkCollision() {
         if(this._hit && !this.previousHit) {
-            this.captain.onCollision(++this.numberOfHits)
+            // this.captain.onCollision(++this.numberOfHits)
 
             let times = this.numberOfHits == 1 ? "time" : "times"
             // console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)

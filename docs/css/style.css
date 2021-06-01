@@ -24,7 +24,7 @@ background {
 
 ship-component {
     width: 113px; height: 66px;
-    background-image: url(../images/ship4.png); 
+    /* background-image: url(../images/ship4.png);  */
 }
 
 captain-component {

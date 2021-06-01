@@ -2,7 +2,7 @@
 
 class Bullet extends GameObject {
     // Fields
-    private captain         : Captain
+    // private captain         : Captain
 
     private numberOfHits    : number = 0
     private _hit: boolean = false
@@ -16,24 +16,27 @@ class Bullet extends GameObject {
     constructor(note: string) {
         super()
         this.note = note;
+        this.style.display = "flex";
+        this.style.justifyContent = "center";
+        this.style.alignItems = "center";
         const banner = document.createElement('span')
         banner.innerHTML = this.note;
         this.appendChild(banner)
-        this.captain = new Captain(this)
+        // this.captain = new Captain(this)
         console.log(note)
     }
 
     public update() {
         this.checkCollision()
 
-        this.captain.update()
+        // this.captain.update()
 
         super.update()
     }
 
     private checkCollision() {
         if(this._hit && !this.previousHit) {
-            this.captain.onCollision(++this.numberOfHits)
+            // this.captain.onCollision(++this.numberOfHits)
             let times = this.numberOfHits == 1 ? "time" : "times"
             console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
             Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)

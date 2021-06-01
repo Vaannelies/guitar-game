@@ -33,41 +33,41 @@ class PitchDetect extends  HTMLElement {
         // stopwatch.stop()
     
 
-        this.detectorElem = document.getElementById( "detector" );
-        this.canvasElem = document.getElementById( "output" );
-        this.DEBUGCANVAS = document.getElementById( "waveform" );
-        if (this.DEBUGCANVAS) {
-            this.waveCanvas = this.DEBUGCANVAS.getContext("2d");
-            this.waveCanvas.strokeStyle = "black";
-            this.waveCanvas.lineWidth = 1;
-        }
-        this.pitchElem = document.getElementById( "pitch" );
-        this.noteElem = document.getElementById( "note" );
-        this.detuneElem = document.getElementById( "detune" );
-        this.detuneAmount = document.getElementById( "detune_amt" );
+        // this.detectorElem = document.getElementById( "detector" );
+        // this.canvasElem = document.getElementById( "output" );
+        // this.DEBUGCANVAS = document.getElementById( "waveform" );
+        // if (this.DEBUGCANVAS) {
+        //     this.waveCanvas = this.DEBUGCANVAS.getContext("2d");
+        //     this.waveCanvas.strokeStyle = "black";
+        //     this.waveCanvas.lineWidth = 1;
+        // }
+        // this.pitchElem = document.getElementById( "pitch" );
+        // this.noteElem = document.getElementById( "note" );
+        // this.detuneElem = document.getElementById( "detune" );
+        // this.detuneAmount = document.getElementById( "detune_amt" );
 
-    this.detectorElem.ondragenter = () => { 
-            this.classList.add("droptarget"); 
-            return false; };
-        this.detectorElem.ondragleave =  () => { this.classList.remove("droptarget"); return false; };
-        this.detectorElem.ondrop =  (e:any) => {
-            this.classList.remove("droptarget");
-            e.preventDefault();
-            this.theBuffer = null;
+    // this.detectorElem.ondragenter = () => { 
+    //         this.classList.add("droptarget"); 
+    //         return false; };
+    //     this.detectorElem.ondragleave =  () => { this.classList.remove("droptarget"); return false; };
+    //     this.detectorElem.ondrop =  (e:any) => {
+    //         this.classList.remove("droptarget");
+    //         e.preventDefault();
+    //         this.theBuffer = null;
 
-            var reader = new FileReader();
-            reader.onload = (event: any) => {
-                this.audioContext?.decodeAudioData( event.target.result, (buffer: any) =>{
-                    this.theBuffer = buffer;
-                }, ()=>{alert("error loading!");} ); 
+            // var reader = new FileReader();
+            // reader.onload = (event: any) => {
+            //     this.audioContext?.decodeAudioData( event.target.result, (buffer: any) =>{
+            //         this.theBuffer = buffer;
+            //     }, ()=>{alert("error loading!");} ); 
 
-            };
-            reader.onerror = () => {
-                alert("Error: " + reader.error );
-            };
-            reader.readAsArrayBuffer(e.dataTransfer.files[0]);
-            return false;
-        };
+            // };
+            // reader.onerror = () => {
+            //     alert("Error: " + reader.error );
+            // };
+            // reader.readAsArrayBuffer(e.dataTransfer.files[0]);
+            // return false;
+        // };
         this.toggleLiveInput();
         console.log("liveinput)")
     }
@@ -107,8 +107,8 @@ class PitchDetect extends  HTMLElement {
         try {
             navigator.getUserMedia = 
                 navigator.getUserMedia;
-                // navigator?.webkitGetUserMedia ||
-                // navigator?.mozGetUserMedia;
+                navigator?.webkitGetUserMedia ||
+                navigator?.mozGetUserMedia;
          
           await navigator.mediaDevices.getUserMedia(dictionary)
           .then((res) => { 
@@ -131,30 +131,30 @@ class PitchDetect extends  HTMLElement {
         this.updatePitch();
     }
 
-    public toggleOscillator() {
-        if (this.isPlaying) {
-            //stop playing and return
-            this.sourceNode.stop( 0 );
-            this.sourceNode = null;
-            this.analyser = null;
-            this.isPlaying = false;
-            if (!window.cancelAnimationFrame)
-                window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame( this.rafID );
-            return "play oscillator";
-        }
-        this.sourceNode = this.audioContext?.createOscillator();
+    // public toggleOscillator() {
+    //     if (this.isPlaying) {
+    //         //stop playing and return
+    //         this.sourceNode.stop( 0 );
+    //         this.sourceNode = null;
+    //         this.analyser = null;
+    //         this.isPlaying = false;
+    //         if (!window.cancelAnimationFrame)
+    //             window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
+    //         window.cancelAnimationFrame( this.rafID );
+    //         return "play oscillator";
+    //     }
+    //     this.sourceNode = this.audioContext?.createOscillator();
 
-        this.analyser = this.audioContext?.createAnalyser();
-        this.analyser.fftSize = 2048;
-        this.sourceNode.connect( this.analyser );
-        this.analyser.connect( this.audioContext?.destination );
-        this.sourceNode.start(0);
-        this.isPlaying = true;
-        this.updatePitch();
+    //     this.analyser = this.audioContext?.createAnalyser();
+    //     this.analyser.fftSize = 2048;
+    //     this.sourceNode.connect( this.analyser );
+    //     this.analyser.connect( this.audioContext?.destination );
+    //     this.sourceNode.start(0);
+    //     this.isPlaying = true;
+    //     this.updatePitch();
 
-        return "stop";
-    }
+    //     return "stop";
+    // }
 
     public async toggleLiveInput() {
         console.log("toggle")
@@ -164,9 +164,9 @@ class PitchDetect extends  HTMLElement {
             this.sourceNode = null;
             this.analyser = null;
             this.isPlaying = false;
-            if (!window.cancelAnimationFrame)
-                window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame( this.rafID );
+            // if (!window.cancelAnimationFrame)
+                // window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
+            // window.cancelAnimationFrame( this.rafID );
         }
         this.getUserMedia(
             {
@@ -182,33 +182,33 @@ class PitchDetect extends  HTMLElement {
             });
     }
 
-    public togglePlayback() {
-        if (this.isPlaying) {
-            //stop playing and return
-            this.sourceNode.stop( 0 );
-            this.sourceNode = null;
-            this.analyser = null;
-            this.isPlaying = false;
-            if (!window.cancelAnimationFrame)
-                window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-            window.cancelAnimationFrame( this.rafID );
-            return "start";
-        }
+    // public togglePlayback() {
+    //     if (this.isPlaying) {
+    //         //stop playing and return
+    //         this.sourceNode.stop( 0 );
+    //         this.sourceNode = null;
+    //         this.analyser = null;
+    //         this.isPlaying = false;
+    //         if (!window.cancelAnimationFrame)
+    //             window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
+    //         window.cancelAnimationFrame( this.rafID );
+    //         return "start";
+    //     }
 
-        this.sourceNode = this.audioContext?.createBufferSource();
-        this.sourceNode.buffer = this.theBuffer;
-        this.sourceNode.loop = true;
+    //     this.sourceNode = this.audioContext?.createBufferSource();
+    //     this.sourceNode.buffer = this.theBuffer;
+    //     this.sourceNode.loop = true;
 
-        this.analyser = this.audioContext?.createAnalyser();
-        this.analyser.fftSize = 2048;
-        this.sourceNode.connect( this.analyser );
-        this.analyser.connect( this.audioContext?.destination );
-        this.sourceNode.start( 0 );
-        this.isPlaying = true;
-        this.updatePitch();
+    //     this.analyser = this.audioContext?.createAnalyser();
+    //     this.analyser.fftSize = 2048;
+    //     this.sourceNode.connect( this.analyser );
+    //     this.analyser.connect( this.audioContext?.destination );
+    //     this.sourceNode.start( 0 );
+    //     this.isPlaying = true;
+    //     this.updatePitch();
 
-        return "stop";
-    }
+    //     return "stop";
+    // }
 
     public rafID: any = null;
     public tracks : any = null;
@@ -345,58 +345,64 @@ class PitchDetect extends  HTMLElement {
         let ac: any = this.autoCorrelate( this.buf, this.audioContext?.sampleRate );
         // TODO: Paint confidence meter on canvasElem here.
 
-        if (this.DEBUGCANVAS) {  // This draws the current waveform, useful for debugging
-            this.waveCanvas.clearRect(0,0,512,256);
-            this.waveCanvas.strokeStyle = "red";
-            this.waveCanvas.beginPath();
-            this.waveCanvas.moveTo(0,0);
-            this.waveCanvas.lineTo(0,256);
-            this.waveCanvas.moveTo(128,0);
-            this.waveCanvas.lineTo(128,256);
-            this.waveCanvas.moveTo(256,0);
-            this.waveCanvas.lineTo(256,256);
-            this.waveCanvas.moveTo(384,0);
-            this.waveCanvas.lineTo(384,256);
-            this.waveCanvas.moveTo(512,0);
-            this.waveCanvas.lineTo(512,256);
-            this.waveCanvas.stroke();
-            this.waveCanvas.strokeStyle = "black";
-            this.waveCanvas.beginPath();
-            this.waveCanvas.moveTo(0,this.buf[0]);
-            for (var i=1;i<512;i++) {
-                this.waveCanvas.lineTo(i,128+(this.buf[i]*128));
-            }
-            this.waveCanvas.stroke();
-        }
+        // if (this.DEBUGCANVAS) {  // This draws the current waveform, useful for debugging
+        //     this.waveCanvas.clearRect(0,0,512,256);
+        //     this.waveCanvas.strokeStyle = "red";
+        //     this.waveCanvas.beginPath();
+        //     this.waveCanvas.moveTo(0,0);
+        //     this.waveCanvas.lineTo(0,256);
+        //     this.waveCanvas.moveTo(128,0);
+        //     this.waveCanvas.lineTo(128,256);
+        //     this.waveCanvas.moveTo(256,0);
+        //     this.waveCanvas.lineTo(256,256);
+        //     this.waveCanvas.moveTo(384,0);
+        //     this.waveCanvas.lineTo(384,256);
+        //     this.waveCanvas.moveTo(512,0);
+        //     this.waveCanvas.lineTo(512,256);
+        //     this.waveCanvas.stroke();
+        //     this.waveCanvas.strokeStyle = "black";
+        //     this.waveCanvas.beginPath();
+        //     this.waveCanvas.moveTo(0,this.buf[0]);
+        //     for (var i=1;i<512;i++) {
+        //         this.waveCanvas.lineTo(i,128+(this.buf[i]*128));
+        //     }
+        //     this.waveCanvas.stroke();
+        // }
 
         if (ac == -1) {
-            this.detectorElem.className = "vague";
-            this.pitchElem.innerText = "--";
-            this.noteElem.innerText = "-";
-            this.detuneElem.className = "";
-            this.detuneAmount.innerText = "--";
+        //     this.detectorElem.className = "vague";
+        //     this.pitchElem.innerText = "--";
+        //     this.noteElem.innerText = "-";
+        //     this.detuneElem.className = "";
+        //     this.detuneAmount.innerText = "--";
         } else {
-            this.detectorElem.className = "confident";
+        //     this.detectorElem.className = "confident";
             let pitch: any = ac;
-            this.pitchElem.innerText = Math.round( pitch ) ;
+        //     this.pitchElem.innerText = Math.round( pitch ) ;
             let note: any = this.noteFromPitch( pitch );
-            this.noteElem.innerHTML = this.noteStrings[note%12];
+        //     this.noteElem.innerHTML = this.noteStrings[note%12];
             let  detune: any = this.centsOffFromPitch( pitch, note );
             if (detune == 0 ) {
-                this.detuneElem.className = "";
-                this.detuneAmount.innerHTML = "--";
+                console.log('perfect!')
+        //         this.detuneElem.className = "";
+        //         this.detuneAmount.innerHTML = "--";
             } else {
-                if (detune < 0)
-                    this.detuneElem.className = "flat";
-                else
-                    this.detuneElem.className = "sharp";
-                this.detuneAmount.innerHTML = Math.abs( detune );
+                console.log('detune: ', detune)
             }
+        //  else {
+        //         if (detune < 0)
+        //             this.detuneElem.className = "flat";
+        //         else
+        //             this.detuneElem.className = "sharp";
+        //         this.detuneAmount.innerHTML = Math.abs( detune );
+        //     }
+            console.log(pitch, 'hoi', this.noteStrings[note%12])
         }
 
-        if (!window.requestAnimationFrame)
-            window.requestAnimationFrame = window.webkitRequestAnimationFrame;
-        this.rafID = window.requestAnimationFrame(this.updatePitch.bind(this));
+
+        // if (!window.requestAnimationFrame)
+        //     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
+        // this.rafID = window.requestAnimationFrame(this.updatePitch.bind(this));
     }
 }
 

@@ -29,7 +29,7 @@ class GameObject extends HTMLElement{
                             this.clientHeight)
         // this.speed      = ((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height) / 200)
         this.speed      = ((document.getElementById('bar').getBoundingClientRect()?.top) / 40)
-        this.rotation   = 90
+        this.rotation   = 0
         console.log(document.getElementById('bar').getBoundingClientRect())
         this.createShip()
     }
@@ -41,7 +41,14 @@ class GameObject extends HTMLElement{
      
         GameObject.numberOfShips++
         if(GameObject.numberOfShips > 6) GameObject.numberOfShips = 1
-        this.style.backgroundImage = `url(images/ship${GameObject.numberOfShips + 3}.png)`
+        this.style.backgroundColor = "white";
+        this.style.height = "10vh";
+        this.style.minHeight = "40px";
+        this.style.width = "10vh"
+        this.style.minWidth = "40px"
+        this.style.borderRadius = "100px";
+        this.style.boxShadow = "0 0 50px 5px blue";
+
         this._color = this.colors[GameObject.numberOfShips - 1]
         this.moveBullet();
         
