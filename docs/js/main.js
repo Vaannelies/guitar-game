@@ -44,7 +44,7 @@ class GameObject extends HTMLElement {
         this.colors = ["Green", "Blue", "Orange", "White", "Black", "Red"];
         this._color = "";
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, (window.innerHeight - ((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.height) - 500));
-        this.speed = 5;
+        this.speed = 1.25;
         this.rotation = 90;
         console.log((window.innerHeight - ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.height)));
         this.createShip();
@@ -74,9 +74,9 @@ class GameObject extends HTMLElement {
     degToRad(degrees) {
         return degrees * Math.PI / 180;
     }
-    hasCollision(ship) {
-        return (ship._position.y < this._position.y + this.clientHeight &&
-            ship._position.y + ship.clientHeight > this._position.y);
+    hasCollision(bar) {
+        return (bar._position.y < this._position.y + this.clientHeight &&
+            bar._position.y + bar.clientHeight > this._position.y);
     }
 }
 GameObject.numberOfShips = 0;
@@ -134,6 +134,8 @@ class Bullet extends GameObject {
             Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
         }
         this.previousHit = this._hit;
+    }
+    hoi() {
     }
 }
 window.customElements.define("ship-component", Bullet);

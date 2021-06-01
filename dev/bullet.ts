@@ -41,6 +41,16 @@ class Bullet extends GameObject {
 
         this.previousHit = this._hit
     }
+
+
+    hoi() {
+
+        // bullet moet op px = window.innerheight - barHeight zijn op moment x 
+        // bullet moet 500 px hoger spawnen dan px
+        // bullet moet er 4 seconden over doen  
+        // dan moet bullet elke seconde 500/4 = 125 px verschuiven 
+        // dus elke 0,1 seconde moet ie 12,5px verschuiven
+    }
 }
 
 window.customElements.define("ship-component", Bullet)

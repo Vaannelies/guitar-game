@@ -24,7 +24,7 @@ class GameObject extends HTMLElement{
                             Math.random() * window.innerWidth   - this.clientWidth, 
                             (window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height - 500))
         // this.speed      = ((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height) / 200)
-        this.speed      = 5
+        this.speed      = 1.25
         this.rotation   = 90
         console.log((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height))
         this.createShip()
@@ -88,9 +88,15 @@ class GameObject extends HTMLElement{
         return degrees * Math.PI / 180
     }
 
-    public hasCollision(ship : any) : boolean {
+    public hasCollision(bar : any) : boolean {
         return (
-                ship._position.y < this._position.y + this.clientHeight &&
-                ship._position.y + ship.clientHeight > this._position.y)
+                bar._position.y < this._position.y + this.clientHeight &&
+                bar._position.y + bar.clientHeight > this._position.y)
     }
+
+         // bullet moet op px = window.innerheight - barHeight zijn op moment x 
+        // bullet moet 500 px hoger spawnen dan px
+        // bullet moet er 4 seconden over doen  
+        // dan moet bullet elke seconde 500/4 = 125 px verschuiven 
+        // dus elke 0,1 seconde moet ie 12,5px verschuiven
 }
