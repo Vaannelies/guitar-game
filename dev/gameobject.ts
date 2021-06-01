@@ -37,6 +37,7 @@ class GameObject extends HTMLElement{
     private createShip() {
         let game = document.getElementsByTagName("game")[0]
         game.appendChild(this)
+        // this.setAttribute('style', 'height = 10vh; min-height: 40px');
      
         GameObject.numberOfShips++
         if(GameObject.numberOfShips > 6) GameObject.numberOfShips = 1
@@ -94,8 +95,8 @@ class GameObject extends HTMLElement{
 
     public hasCollision(bar : any) : boolean {
         return (
-            document.getElementById('bar').getBoundingClientRect()?.top < this._position.y &&
-            document.getElementById('bar').getBoundingClientRect()?.bottom > this._position.y)
+            document.getElementById('bar').getBoundingClientRect()?.top < (this._position.y + this.clientHeight) &&
+            document.getElementById('bar').getBoundingClientRect()?.bottom > (this._position.y - this.clientHeight))
     }
 
          // bullet moet op px = window.innerheight - barHeight zijn op moment x 

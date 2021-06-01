@@ -79,8 +79,8 @@ class GameObject extends HTMLElement {
     }
     hasCollision(bar) {
         var _a, _b;
-        return (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) < this._position.y &&
-            ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.bottom) > this._position.y);
+        return (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) < (this._position.y + this.clientHeight) &&
+            ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.bottom) > (this._position.y - this.clientHeight));
     }
 }
 GameObject.numberOfShips = 0;
@@ -249,24 +249,6 @@ class Main {
             this.audioPlayer.play();
             this.messageboard = Messageboard.getInstance();
             console.log(this.messageboard);
-            this.notes.forEach(note => {
-                let newSec;
-                let hallo;
-                if (this.timer.sec < 10) {
-                    newSec = note.time.substring(1);
-                    let hoi = parseInt(newSec, 10);
-                    hoi -= 4;
-                    if (hoi < 10) {
-                        note.time = 0 + hoi.toString() + ".00";
-                    }
-                    else {
-                        note.time = hoi.toString() + ".00";
-                    }
-                }
-                else {
-                    note.time = (parseInt(note.time, 10) - 4).toString() + ".00";
-                }
-            });
             this.gameLoop();
         });
     }
@@ -282,7 +264,23 @@ class Main {
             console.log("het is 5 lol");
         }
         this.notes.forEach(note => {
-            if (note.time.toString() == (this.timer.sec + "." + this.timer.ms).toString()) {
+            let newSec;
+            let hallo;
+            if (this.timer.sec < 10) {
+                newSec = this.timer.sec.substring(1);
+                let hoi = parseInt(newSec, 10);
+                hoi += 4;
+                if (hoi < 10) {
+                    hallo = 0 + hoi.toString();
+                }
+                else {
+                    hallo = hoi.toString();
+                }
+            }
+            else {
+                hallo = this.timer.sec + 4;
+            }
+            if (note.time.toString() == (hallo + "." + this.timer.ms).toString()) {
                 console.log(note.title);
                 this.bullets.push(new Bullet(note.title));
             }
