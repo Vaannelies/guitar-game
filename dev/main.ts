@@ -17,7 +17,7 @@ class Main {
     private messageboard : Messageboard
     private timer: Timer
     private isPaused: boolean = false
-    private notes: {title: string, time: number}[]
+    private notes: {title: string, time: string}[]
     private bar: Bar
 
 
@@ -106,6 +106,28 @@ class Main {
 
         // pitchdetect.toggleLiveInput();
 
+        
+        this.notes.forEach(note => {
+            // console.log('time', note.time.toString())
+            // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
+            // console.log(this.timer.sec+4)
+            let newSec;
+            let hallo;
+            if(this.timer.sec < 10) {
+                // console.log(this.timer.sec)
+               newSec =  note.time.substring(1)
+            //    console.log(newSec)
+               let hoi = parseInt(newSec,10)
+               hoi -= 4;
+               if(hoi < 10) {
+                   note.time = 0 +  hoi.toString() + ".00"
+               } else {
+                   note.time = hoi.toString() + ".00"
+               }
+            } else {
+                note.time = (parseInt(note.time, 10) - 4 ).toString() + ".00"
+            }
+        })
         this.gameLoop()
     }
     
@@ -124,6 +146,26 @@ class Main {
         this.notes.forEach(note => {
                 // console.log('time', note.time.toString())
                 // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
+                // console.log(this.timer.sec+4)
+                // let newSec;
+                // let hallo;
+                // if(this.timer.sec < 10) {
+                //     // console.log(this.timer.sec)
+                //    newSec =  this.timer.sec.substring(1)
+                // //    console.log(newSec)
+                //    let hoi = parseInt(newSec,10)
+                //    hoi += 4;
+                //    if(hoi < 10) {
+                //        hallo = 0 +  hoi.toString() 
+                //    } else {
+                //        hallo = hoi.toString()
+                //    }
+                // } else {
+                //     hallo = this.timer.sec + 4
+                // }
+
+                // console.log(hallo)
+                // console.log(note.time)
             if(note.time.toString() == (this.timer.sec+"."+this.timer.ms).toString()) {
                 console.log(note.title);
                 this.bullets.push(new Bullet(note.title))
@@ -138,6 +180,7 @@ class Main {
                 if(ship !== otherShip) {
                     if(ship.hasCollision(this.bar)) {
                         ship.hit = true
+                        console.log(ship.note, this.timer.sec, ":", this.timer.ms)
                         // break inner loop to prevent overwriting the hit
                         break
                     } 

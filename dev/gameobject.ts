@@ -20,20 +20,24 @@ class GameObject extends HTMLElement{
     constructor() {
         super()
 
+        console.log('clientheight', document.documentElement.clientHeight);
+        console.log("this.clientheight", this.clientHeight);
+        console.log('windowinnerheight', window.innerHeight)
+
         this._position  = new Vector(
                             Math.random() * window.innerWidth   - this.clientWidth, 
-                            (window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height - 500))
+                            this.clientHeight)
         // this.speed      = ((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height) / 200)
-        this.speed      = 1.25
+        this.speed      = ((document.getElementById('bar').getBoundingClientRect()?.top) / 40)
         this.rotation   = 90
-        console.log((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height))
+        console.log(document.getElementById('bar').getBoundingClientRect())
         this.createShip()
     }
 
     private createShip() {
         let game = document.getElementsByTagName("game")[0]
         game.appendChild(this)
-
+     
         GameObject.numberOfShips++
         if(GameObject.numberOfShips > 6) GameObject.numberOfShips = 1
         this.style.backgroundImage = `url(images/ship${GameObject.numberOfShips + 3}.png)`
@@ -45,7 +49,7 @@ class GameObject extends HTMLElement{
     public moveBullet() {
         this._position.y += this.speed; 
         this.draw()
-        setTimeout(() => {this.moveBullet()}, 10)
+        setTimeout(() => {this.moveBullet()}, 100)
     }
 
     public update() {
@@ -90,8 +94,8 @@ class GameObject extends HTMLElement{
 
     public hasCollision(bar : any) : boolean {
         return (
-                bar._position.y < this._position.y + this.clientHeight &&
-                bar._position.y + bar.clientHeight > this._position.y)
+            document.getElementById('bar').getBoundingClientRect()?.top < this._position.y &&
+            document.getElementById('bar').getBoundingClientRect()?.bottom > this._position.y)
     }
 
          // bullet moet op px = window.innerheight - barHeight zijn op moment x 
@@ -99,4 +103,11 @@ class GameObject extends HTMLElement{
         // bullet moet er 4 seconden over doen  
         // dan moet bullet elke seconde 500/4 = 125 px verschuiven 
         // dus elke 0,1 seconde moet ie 12,5px verschuiven
-}
+
+
+        // bullet moet op px = window.innerheight - barHeight zijn op moment x 
+       // bullet moet op window.innerheight spawnen, dus 0 px.
+       // bullet moet er 4 seconden over doen  
+       // dan moet bullet elke seconde ((window.innerheight - barHeight) / 4 ) = .... px verschuiven 
+       // dus elke 0,1 seconde moet ie 0,.... px verschuiven
+    }

@@ -38,15 +38,18 @@ class AudioPlayer extends HTMLElement {
 window.customElements.define("audioplayer-component", AudioPlayer);
 class GameObject extends HTMLElement {
     constructor() {
-        var _a, _b;
+        var _a;
         super();
         this.rotation = 0;
         this.colors = ["Green", "Blue", "Orange", "White", "Black", "Red"];
         this._color = "";
-        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, (window.innerHeight - ((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.height) - 500));
-        this.speed = 1.25;
+        console.log('clientheight', document.documentElement.clientHeight);
+        console.log("this.clientheight", this.clientHeight);
+        console.log('windowinnerheight', window.innerHeight);
+        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, this.clientHeight);
+        this.speed = (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) / 40);
         this.rotation = 90;
-        console.log((window.innerHeight - ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.height)));
+        console.log(document.getElementById('bar').getBoundingClientRect());
         this.createShip();
     }
     get position() { return this._position; }
@@ -64,7 +67,7 @@ class GameObject extends HTMLElement {
     moveBullet() {
         this._position.y += this.speed;
         this.draw();
-        setTimeout(() => { this.moveBullet(); }, 10);
+        setTimeout(() => { this.moveBullet(); }, 100);
     }
     update() {
     }
@@ -75,8 +78,9 @@ class GameObject extends HTMLElement {
         return degrees * Math.PI / 180;
     }
     hasCollision(bar) {
-        return (bar._position.y < this._position.y + this.clientHeight &&
-            bar._position.y + bar.clientHeight > this._position.y);
+        var _a, _b;
+        return (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) < this._position.y &&
+            ((_b = document.getElementById('bar').getBoundingClientRect()) === null || _b === void 0 ? void 0 : _b.bottom) > this._position.y);
     }
 }
 GameObject.numberOfShips = 0;
@@ -89,7 +93,7 @@ class Bar extends HTMLElement {
         this.previousHit = false;
         const bar = document.createElement('div');
         bar.setAttribute('id', 'bar');
-        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: grey; height: 40px; z-index: -1;');
+        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: grey; height: 10vh; min-height: 40px; z-index: -1;');
         (_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.appendChild(bar);
         this._position = new Vector(0, window.innerHeight);
     }
@@ -119,6 +123,7 @@ class Bullet extends GameObject {
         banner.innerHTML = this.note;
         this.appendChild(banner);
         this.captain = new Captain(this);
+        console.log(note);
     }
     set hit(value) { this._hit = value; }
     update() {
@@ -244,6 +249,24 @@ class Main {
             this.audioPlayer.play();
             this.messageboard = Messageboard.getInstance();
             console.log(this.messageboard);
+            this.notes.forEach(note => {
+                let newSec;
+                let hallo;
+                if (this.timer.sec < 10) {
+                    newSec = note.time.substring(1);
+                    let hoi = parseInt(newSec, 10);
+                    hoi -= 4;
+                    if (hoi < 10) {
+                        note.time = 0 + hoi.toString() + ".00";
+                    }
+                    else {
+                        note.time = hoi.toString() + ".00";
+                    }
+                }
+                else {
+                    note.time = (parseInt(note.time, 10) - 4).toString() + ".00";
+                }
+            });
             this.gameLoop();
         });
     }
@@ -270,6 +293,7 @@ class Main {
                 if (ship !== otherShip) {
                     if (ship.hasCollision(this.bar)) {
                         ship.hit = true;
+                        console.log(ship.note, this.timer.sec, ":", this.timer.ms);
                         break;
                     }
                     else {
