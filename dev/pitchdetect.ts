@@ -13,6 +13,9 @@ class PitchDetect extends  HTMLElement {
     public	noteElem: any;
     public	detuneElem: any;
     public	detuneAmount: any;
+    public pitch: any;
+    public note: any;
+    public detune: any;
 
     constructor() {
         super();
@@ -377,17 +380,17 @@ class PitchDetect extends  HTMLElement {
         //     this.detuneAmount.innerText = "--";
         } else {
         //     this.detectorElem.className = "confident";
-            let pitch: any = ac;
+            this.pitch = ac;
         //     this.pitchElem.innerText = Math.round( pitch ) ;
-            let note: any = this.noteFromPitch( pitch );
+            this.note = this.noteFromPitch( this.pitch );
         //     this.noteElem.innerHTML = this.noteStrings[note%12];
-            let  detune: any = this.centsOffFromPitch( pitch, note );
-            if (detune == 0 ) {
+            this.detune= this.centsOffFromPitch( this.pitch, this.note );
+            if (this.detune == 0 ) {
                 console.log('perfect!')
         //         this.detuneElem.className = "";
         //         this.detuneAmount.innerHTML = "--";
             } else {
-                console.log('detune: ', detune)
+                console.log('detune: ', this.detune)
             }
         //  else {
         //         if (detune < 0)
@@ -396,7 +399,7 @@ class PitchDetect extends  HTMLElement {
         //             this.detuneElem.className = "sharp";
         //         this.detuneAmount.innerHTML = Math.abs( detune );
         //     }
-            console.log(pitch, 'hoi', this.noteStrings[note%12])
+            console.log(this.pitch, 'hoi', this.noteStrings[this.note%12])
         }
 
 

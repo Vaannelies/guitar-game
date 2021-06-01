@@ -18,7 +18,8 @@ game *{
 background {
     width: 100vw; height: 100vh;
     z-index: -2;
-    background-image: url(../images/sea.png);
+    /* background-image: url(../images/sea.png); */
+    background-color: rgb(22, 22, 33); 
     background-repeat: repeat;
 }
 

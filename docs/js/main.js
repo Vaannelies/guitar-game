@@ -43,13 +43,9 @@ class GameObject extends HTMLElement {
         this.rotation = 0;
         this.colors = ["Green", "Blue", "Orange", "White", "Black", "Red"];
         this._color = "";
-        console.log('clientheight', document.documentElement.clientHeight);
-        console.log("this.clientheight", this.clientHeight);
-        console.log('windowinnerheight', window.innerHeight);
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, this.clientHeight);
         this.speed = (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) / 40);
         this.rotation = 0;
-        console.log(document.getElementById('bar').getBoundingClientRect());
         this.createShip();
     }
     get position() { return this._position; }
@@ -66,7 +62,7 @@ class GameObject extends HTMLElement {
         this.style.width = "10vh";
         this.style.minWidth = "40px";
         this.style.borderRadius = "100px";
-        this.style.boxShadow = "0 0 50px 5px blue";
+        this.style.boxShadow = "0 0 50px 1px #3c00ff";
         this._color = this.colors[GameObject.numberOfShips - 1];
         this.moveBullet();
     }
@@ -129,7 +125,6 @@ class Bullet extends GameObject {
         const banner = document.createElement('span');
         banner.innerHTML = this.note;
         this.appendChild(banner);
-        console.log(note);
     }
     set hit(value) { this._hit = value; }
     update() {
@@ -139,7 +134,6 @@ class Bullet extends GameObject {
     checkCollision() {
         if (this._hit && !this.previousHit) {
             let times = this.numberOfHits == 1 ? "time" : "times";
-            console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
             Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
         }
         this.previousHit = this._hit;
@@ -177,7 +171,6 @@ class Main {
         this.pitchdetect = new PitchDetect();
         this.pitchdetect.updatePitch();
         this.bar = new Bar();
-        console.log(this.bar);
         this.createMenu();
     }
     createMenu() {
@@ -259,7 +252,6 @@ class Main {
                 hallo = this.timer.sec + 4;
             }
             if (note.time.toString() == (hallo + "." + this.timer.ms).toString()) {
-                console.log(note.title);
                 this.bullets.push(new Bullet(note.title));
             }
         });
@@ -271,6 +263,11 @@ class Main {
                         ship.hit = true;
                         ship.style.backgroundColor = "#e2eaff";
                         console.log(ship.note, this.timer.sec, ":", this.timer.ms);
+                        console.log('collision', this.pitchdetect.note, ship.note);
+                        if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === ship.note) {
+                            ship.style.backgroundColor = "#00ee00";
+                            ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                        }
                         break;
                     }
                     else {
@@ -430,16 +427,16 @@ class PitchDetect extends HTMLElement {
         if (ac == -1) {
         }
         else {
-            let pitch = ac;
-            let note = this.noteFromPitch(pitch);
-            let detune = this.centsOffFromPitch(pitch, note);
-            if (detune == 0) {
+            this.pitch = ac;
+            this.note = this.noteFromPitch(this.pitch);
+            this.detune = this.centsOffFromPitch(this.pitch, this.note);
+            if (this.detune == 0) {
                 console.log('perfect!');
             }
             else {
-                console.log('detune: ', detune);
+                console.log('detune: ', this.detune);
             }
-            console.log(pitch, 'hoi', this.noteStrings[note % 12]);
+            console.log(this.pitch, 'hoi', this.noteStrings[this.note % 12]);
         }
     }
 }

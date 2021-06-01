@@ -23,7 +23,7 @@ class Bullet extends GameObject {
         banner.innerHTML = this.note;
         this.appendChild(banner)
         // this.captain = new Captain(this)
-        console.log(note)
+        // console.log(note)
     }
 
     public update() {
@@ -38,7 +38,7 @@ class Bullet extends GameObject {
         if(this._hit && !this.previousHit) {
             // this.captain.onCollision(++this.numberOfHits)
             let times = this.numberOfHits == 1 ? "time" : "times"
-            console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
+            // console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
             Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
         }
 

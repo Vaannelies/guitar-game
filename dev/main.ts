@@ -38,7 +38,7 @@ class Main {
         this.pitchdetect.updatePitch()
 
         this.bar = new Bar();
-        console.log(this.bar)
+        // console.log(this.bar)
 
 
         this.createMenu();
@@ -168,7 +168,7 @@ class Main {
                 // console.log(hallo)
                 // console.log(note.time)
             if(note.time.toString() == (hallo+"."+this.timer.ms).toString()) {
-                console.log(note.title);
+                // console.log(note.title);
                 this.bullets.push(new Bullet(note.title))
             }
         })
@@ -184,6 +184,11 @@ class Main {
                         ship.style.backgroundColor = "#e2eaff";
                         console.log(ship.note, this.timer.sec, ":", this.timer.ms)
                         // break inner loop to prevent overwriting the hit
+                        console.log('collision', this.pitchdetect.note, ship.note)
+                        if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
+                            ship.style.backgroundColor = "#00ee00";
+                            ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                        }
                         break
                     } 
                     else {
