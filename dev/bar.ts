@@ -18,7 +18,7 @@ class Bar extends HTMLElement {
 
         const bar = document.createElement('div')
         bar.setAttribute('id', 'bar')
-        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: grey; height: 10vh; min-height: 40px; z-index: -1;')
+        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: white; height: 10vh; min-height: 40px; z-index: -1; border-top: 2px solid  #ccddFF; box-shadow: 0 0 10px 1px  #ccddFF;')
         // banner.innerHTML = this.note;
         document.querySelector('body')?.appendChild(bar)
         this._position  = new Vector(

@@ -91,7 +91,7 @@ class Main {
 
     async start() {
         await this.fetchNotesForSong();
-        console.log("notes", this.notes)
+        // console.log("notes", this.notes)
 
 
         this.timer.startTimer();
@@ -103,7 +103,7 @@ class Main {
    
         // Eventueel Messageboard aanmaken zodat deze zichtbaar wordt?
         this.messageboard = Messageboard.getInstance()
-        console.log(this.messageboard)
+        // console.log(this.messageboard)
 
         // pitchdetect.toggleLiveInput();
 
@@ -141,8 +141,10 @@ class Main {
     gameLoop() {
         // this.pitchdetect.updatePitch()
         if(this.timer.sec == 5) {
-            console.log("het is 5 lol");
+            // console.log("het is 5 lol");
         }
+
+        
 
         this.notes.forEach(note => {
                 // console.log('time', note.time.toString())
@@ -168,7 +170,7 @@ class Main {
                 // console.log(hallo)
                 // console.log(note.time)
             if(note.time.toString() == (hallo+"."+this.timer.ms).toString()) {
-                // console.log(note.title);
+                console.log(note.title);
                 this.bullets.push(new Bullet(note.title))
             }
         })
@@ -186,12 +188,12 @@ class Main {
 
                             ship.hit = true
                             ship.style.backgroundColor = "#e2eaff";
-                            console.log(ship.note, this.timer.sec, ":", this.timer.ms)
+                            // console.log(ship.note, this.timer.sec, ":", this.timer.ms)
                             // break inner loop to prevent overwriting the hit
-                            console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], ship.note)
+                            // console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], ship.note)
                             if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
                                 ship.style.backgroundColor = "#00ee00";
-                                ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                                ship.style.boxShadow = "0 0 30px 1px #00ee00";
                             }
                             break
                         }

@@ -62,7 +62,7 @@ class GameObject extends HTMLElement {
         this.style.width = "10vh";
         this.style.minWidth = "40px";
         this.style.borderRadius = "100px";
-        this.style.boxShadow = "0 0 50px 1px #3c00ff";
+        this.style.boxShadow = "0 0 30px 1px #3c00ff";
         this._color = this.colors[GameObject.numberOfShips - 1];
         this.moveBullet();
     }
@@ -95,7 +95,7 @@ class Bar extends HTMLElement {
         this.previousHit = false;
         const bar = document.createElement('div');
         bar.setAttribute('id', 'bar');
-        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: grey; height: 10vh; min-height: 40px; z-index: -1;');
+        bar.setAttribute('style', 'position: absolute; bottom: 0; width: 100%; background: white; height: 10vh; min-height: 40px; z-index: -1; border-top: 2px solid  #ccddFF; box-shadow: 0 0 10px 1px  #ccddFF;');
         (_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.appendChild(bar);
         this._position = new Vector(0, window.innerHeight);
     }
@@ -147,7 +147,6 @@ class Messageboard extends HTMLElement {
         super();
         let game = document.getElementsByTagName("game")[0];
         game.appendChild(this);
-        console.log("Hoii");
     }
     static getInstance() {
         if (!Messageboard.instance)
@@ -155,7 +154,6 @@ class Messageboard extends HTMLElement {
         return Messageboard.instance;
     }
     addMessage(m) {
-        console.log("Hoi2");
         let item = document.createElement("LI");
         item.innerHTML = m;
         this.appendChild(item);
@@ -212,12 +210,10 @@ class Main {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.fetchNotesForSong();
-            console.log("notes", this.notes);
             this.timer.startTimer();
             this.audioPlayer = new AudioPlayer();
             this.audioPlayer.play();
             this.messageboard = Messageboard.getInstance();
-            console.log(this.messageboard);
             this.gameLoop();
         });
     }
@@ -230,7 +226,6 @@ class Main {
     }
     gameLoop() {
         if (this.timer.sec == 5) {
-            console.log("het is 5 lol");
         }
         this.notes.forEach(note => {
             let newSec;
@@ -250,6 +245,7 @@ class Main {
                 hallo = this.timer.sec + 4;
             }
             if (note.time.toString() == (hallo + "." + this.timer.ms).toString()) {
+                console.log(note.title);
                 this.bullets.push(new Bullet(note.title));
             }
         });
@@ -264,11 +260,9 @@ class Main {
                         else {
                             ship.hit = true;
                             ship.style.backgroundColor = "#e2eaff";
-                            console.log(ship.note, this.timer.sec, ":", this.timer.ms);
-                            console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note % 12], ship.note);
                             if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === ship.note) {
                                 ship.style.backgroundColor = "#00ee00";
-                                ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                                ship.style.boxShadow = "0 0 30px 1px #00ee00";
                             }
                             break;
                         }

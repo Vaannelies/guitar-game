@@ -8,7 +8,7 @@ class Messageboard extends HTMLElement {
         game.appendChild(this)
 
         // this.addMessage()
-        console.log("Hoii")
+        // console.log("Hoii")
 
     }
 
@@ -18,7 +18,7 @@ class Messageboard extends HTMLElement {
     }
 
     public addMessage(m : string) {
-        console.log("Hoi2")
+        // console.log("Hoi2")
             let item = document.createElement("LI")
            
             item.innerHTML = m

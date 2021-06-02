@@ -9,7 +9,7 @@ class GameObject extends HTMLElement{
     private rotation        : number = 0
     // private rotationSpeed   : number = 0
     
-    // private counter         : number = 60
+    // private counter         : number = 60hl 
 
     private colors          : string[] = ["Green", "Blue", "Orange", "White", "Black", "Red"]
     private _color          : string   = ""
@@ -47,7 +47,7 @@ class GameObject extends HTMLElement{
         this.style.width = "10vh"
         this.style.minWidth = "40px"
         this.style.borderRadius = "100px";
-        this.style.boxShadow = "0 0 50px 1px #3c00ff";
+        this.style.boxShadow = "0 0 30px 1px #3c00ff";
 
         this._color = this.colors[GameObject.numberOfShips - 1]
         this.moveBullet();
@@ -57,10 +57,14 @@ class GameObject extends HTMLElement{
     public moveBullet() {
         this._position.y += this.speed; 
         this.draw()
+        // if(Ti)
         setTimeout(() => {this.moveBullet()}, 100)
     }
-
+    
     public update() {
+        // this._position.y += this.speed; 
+        // this.draw()
+
         // this._position.x += Math.cos(this.degToRad(this.rotation)) * this.speed.x
         
         // this.turn()
