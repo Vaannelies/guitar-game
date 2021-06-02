@@ -4,8 +4,8 @@ class GameObject extends HTMLElement{
     // Fields
     private static numberOfShips : number = 0
 
-    private _position       : Vector 
-    private speed           : number
+    public _position       : Vector 
+    public speed           : number
     private rotation        : number = 0
     // private rotationSpeed   : number = 0
     

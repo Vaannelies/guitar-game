@@ -1,5 +1,5 @@
 class AudioPlayer extends HTMLElement {
-    private audio: HTMLAudioElement;
+    public audio: HTMLAudioElement;
 
     constructor() {
         super()

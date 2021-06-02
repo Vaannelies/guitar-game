@@ -224,7 +224,19 @@ class Main {
                 .then(json => { this.notes = json.notes; });
         });
     }
+    checkDelay() {
+        if ((this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60) <= -1) {
+            const delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
+            console.log('delay:', delay);
+            this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
+            for (const ship of this.bullets) {
+                ship._position.y = ship._position.y + ship.speed * delay * 100;
+            }
+        }
+    }
     gameLoop() {
+        console.log(this.audioPlayer.audio.currentTime);
+        this.checkDelay();
         if (this.timer.sec == 5) {
         }
         this.notes.forEach(note => {
