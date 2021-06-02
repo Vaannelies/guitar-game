@@ -17,22 +17,25 @@ class PitchDetect extends  HTMLElement {
     public note: any;
     public detune: any;
 
+    public active: boolean;
+
     constructor() {
         super();
         window.AudioContext = window.AudioContext;
 
         this.audioContext = new AudioContext();
         // let MAX_SIZE = Math.max(4,Math.floor(this.audioContext.sampleRate/5000));	// corresponds to a 5kHz signal
-        var request = new XMLHttpRequest();
-        request.open("GET",  "./audio/vocal1.ogg", true);
-        request.responseType = "arraybuffer";
-        request.onload = ()=> {
-        this.audioContext?.decodeAudioData( request.response, (buffer: any) => { 
-                this.theBuffer = buffer;
-            } );
-        }
-        request.send();
-
+        // var request = new XMLHttpRequest();
+        // request.open("GET",  "./audio/vocal1.ogg", true);
+        // request.responseType = "arraybuffer";
+        // request.onload = ()=> {
+        // this.audioContext?.decodeAudioData( request.response, (buffer: any) => { 
+        //         this.theBuffer = buffer;
+        //     } );
+        // }
+        // request.send();
+        this.active = false;
+        this.updatePitch();
         // stopwatch.stop()
     
 
@@ -75,6 +78,10 @@ class PitchDetect extends  HTMLElement {
         console.log("liveinput)")
     }
 
+    public activate() {
+        this.active = true;
+        this.updatePitch();
+    }
         // -------------------
 
         /*
@@ -208,7 +215,7 @@ class PitchDetect extends  HTMLElement {
     //     this.analyser.connect( this.audioContext?.destination );
     //     this.sourceNode.start( 0 );
     //     this.isPlaying = true;
-    //     this.updatePitch();
+        // this.updatePitch();
 
     //     return "stop";
     // }
@@ -345,7 +352,7 @@ class PitchDetect extends  HTMLElement {
 
             this.analyser.getFloatTimeDomainData( this.buf );
         }
-        let ac: any = this.autoCorrelate( this.buf, this.audioContext?.sampleRate );
+        let ac: any = this.autoCorrelate(this.buf, this.audioContext?.sampleRate );
         // TODO: Paint confidence meter on canvasElem here.
 
         // if (this.DEBUGCANVAS) {  // This draws the current waveform, useful for debugging
@@ -402,7 +409,10 @@ class PitchDetect extends  HTMLElement {
             console.log(this.pitch, 'hoi', this.noteStrings[this.note%12])
         }
 
-
+        if(this.active) {
+            setTimeout(() => {this.updatePitch()}, 19);
+            // setTimeout(() => {this.updatePitch()
+        }
         // if (!window.requestAnimationFrame)
         //     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
         // this.rafID = window.requestAnimationFrame(this.updatePitch.bind(this));

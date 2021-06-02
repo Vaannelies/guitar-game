@@ -35,7 +35,7 @@ class Main {
         this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
         // console.log(pitchdetect)
-        this.pitchdetect.updatePitch()
+        // this.pitchdetect.updatePitch()
 
         this.bar = new Bar();
         // console.log(this.bar)
@@ -139,7 +139,7 @@ class Main {
     }
 
     gameLoop() {
-        this.pitchdetect.updatePitch()
+        // this.pitchdetect.updatePitch()
         if(this.timer.sec == 5) {
             console.log("het is 5 lol");
         }
@@ -180,19 +180,25 @@ class Main {
             for (const otherShip of this.bullets) {
                 if(ship !== otherShip) {
                     if(ship.hasCollision(this.bar)) {
-                        ship.hit = true
-                        ship.style.backgroundColor = "#e2eaff";
-                        console.log(ship.note, this.timer.sec, ":", this.timer.ms)
-                        // break inner loop to prevent overwriting the hit
-                        console.log('collision', this.pitchdetect.note, ship.note)
-                        if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
-                            ship.style.backgroundColor = "#00ee00";
-                            ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                        if(!this.pitchdetect.active) {
+                            this.pitchdetect.activate()
+                        } else {
+
+                            ship.hit = true
+                            ship.style.backgroundColor = "#e2eaff";
+                            console.log(ship.note, this.timer.sec, ":", this.timer.ms)
+                            // break inner loop to prevent overwriting the hit
+                            console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], ship.note)
+                            if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
+                                ship.style.backgroundColor = "#00ee00";
+                                ship.style.boxShadow = "0 0 50px 1px #00ee00";
+                            }
+                            break
                         }
-                        break
-                    } 
+                    }
                     else {
                         ship.hit = false
+                        this.pitchdetect.active = false
                     }
                 }
             }
