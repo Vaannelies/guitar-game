@@ -269,6 +269,9 @@ class Main {
                                     ship.style.boxShadow = "0 0 30px 1px red";
                                 }
                                 break
+                            } else {
+                                ship.style.backgroundColor = "#222222";
+                                ship.style.boxShadow = "0 0 0 0";
                             }
                         }
                     }

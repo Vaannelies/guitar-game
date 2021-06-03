@@ -62,6 +62,7 @@ class GameObject extends HTMLElement {
         this.style.width = "10vh";
         this.style.minWidth = "40px";
         this.style.borderRadius = "100px";
+        this.style.transition = "box-shadow 0.2s ease, background-color 0.2s ease";
         this.style.boxShadow = "0 0 30px 1px #3c00ff";
         this._color = this.colors[GameObject.numberOfShips - 1];
     }
@@ -294,6 +295,10 @@ class Main {
                                     ship.style.boxShadow = "0 0 30px 1px red";
                                 }
                                 break;
+                            }
+                            else {
+                                ship.style.backgroundColor = "#222222";
+                                ship.style.boxShadow = "0 0 0 0";
                             }
                         }
                     }
