@@ -160,12 +160,12 @@ class Main {
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
         // console.log('delay:', delay);
-        console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime%60 )
+        // console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime%60 )
         this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
         if(this.delay <= -0.4 || this.delay>= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
             this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
-            console.log("fixed delay")
+            // console.log("fixed delay")
             // this.fixCurrentPositions()
             // this.spawnLateBullets()
         }
@@ -256,12 +256,20 @@ class Main {
                             ship.style.backgroundColor = "#e2eaff";
                             // console.log(ship.note, this.timer.sec, ":", this.timer.ms)
                             // break inner loop to prevent overwriting the hit
+                            console.log(this.pitchdetect.note)
                             // console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], ship.note)
-                            if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
-                                ship.style.backgroundColor = "#00ee00";
-                                ship.style.boxShadow = "0 0 30px 1px #00ee00";
+                            if(this.pitchdetect.note !== null) {
+                            // if(this.pitchdetect.noteStrings.indexOf(this.pitchdetect.note%12)) {
+                                if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
+                                    ship.style.backgroundColor = "#00ee00";
+                                    ship.style.boxShadow = "0 0 30px 1px #00ee00";
+                                }
+                                else if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] !== ship.note) {
+                                    ship.style.backgroundColor = "red";
+                                    ship.style.boxShadow = "0 0 30px 1px red";
+                                }
+                                break
                             }
-                            break
                         }
                     }
                     else {

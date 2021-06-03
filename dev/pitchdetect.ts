@@ -383,6 +383,7 @@ class PitchDetect extends  HTMLElement {
         // }
 
         if (ac == -1) {
+            this.note = null;
         //     this.detectorElem.className = "vague";
         //     this.pitchElem.innerText = "--";
         //     this.noteElem.innerText = "-";
@@ -414,7 +415,7 @@ class PitchDetect extends  HTMLElement {
 
     
         this.activeTime++
-        console.log(this.activeTime)
+        // console.log(this.activeTime)
         setTimeout(() => {this.updatePitch()}, 19);
         // setTimeout(() => {this.updatePitch()
     }

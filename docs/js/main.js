@@ -129,7 +129,6 @@ class Bullet extends GameObject {
         this.checkCollision();
     }
     moveBullet() {
-        console.log(this.main.audioPlayer.audio.currentTime % 60);
         this._position.y =
             (((this.main.audioPlayer.audio.currentTime % 60) - ((parseInt(this.time.sec) + (parseInt(this.time.ms) / 100)) - 4)) * this.speed);
         this.draw();
@@ -248,12 +247,10 @@ class Main {
     }
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
-        console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime % 60);
         this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
         if (this.delay <= -0.4 || this.delay >= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
             this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0, 2);
-            console.log("fixed delay");
         }
     }
     fixCurrentPositions() {
@@ -286,11 +283,18 @@ class Main {
                         else {
                             ship.hit = true;
                             ship.style.backgroundColor = "#e2eaff";
-                            if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === ship.note) {
-                                ship.style.backgroundColor = "#00ee00";
-                                ship.style.boxShadow = "0 0 30px 1px #00ee00";
+                            console.log(this.pitchdetect.note);
+                            if (this.pitchdetect.note !== null) {
+                                if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === ship.note) {
+                                    ship.style.backgroundColor = "#00ee00";
+                                    ship.style.boxShadow = "0 0 30px 1px #00ee00";
+                                }
+                                else if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] !== ship.note) {
+                                    ship.style.backgroundColor = "red";
+                                    ship.style.boxShadow = "0 0 30px 1px red";
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                     else {
@@ -450,6 +454,7 @@ class PitchDetect extends HTMLElement {
             }
             let ac = this.autoCorrelate(this.buf, (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.sampleRate);
             if (ac == -1) {
+                this.note = null;
             }
             else {
                 this.pitch = ac;
@@ -462,7 +467,6 @@ class PitchDetect extends HTMLElement {
                 }
             }
             this.activeTime++;
-            console.log(this.activeTime);
             setTimeout(() => { this.updatePitch(); }, 19);
         }
     }
