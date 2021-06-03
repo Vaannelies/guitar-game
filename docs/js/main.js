@@ -131,7 +131,7 @@ class Bullet extends GameObject {
     moveBullet() {
         console.log(this.main.audioPlayer.audio.currentTime % 60);
         this._position.y =
-            (((this.main.audioPlayer.audio.currentTime % 60) - (parseInt(this.time.sec) - 4)) * this.speed);
+            (((this.main.audioPlayer.audio.currentTime % 60) - ((parseInt(this.time.sec) + (parseInt(this.time.ms) / 100)) - 4)) * this.speed);
         this.draw();
         setTimeout(() => { this.moveBullet(); }, 100);
     }
