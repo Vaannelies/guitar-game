@@ -49,18 +49,11 @@ class GameObject extends HTMLElement {
     get position() { return this._position; }
     createBullet() {
         let game = document.getElementsByTagName("game")[0];
+        this.setAttribute('class', 'bullet');
         game.appendChild(this);
         GameObject.numberOfBullets++;
         if (GameObject.numberOfBullets > 6)
             GameObject.numberOfBullets = 1;
-        this.style.backgroundColor = "white";
-        this.style.height = "10vh";
-        this.style.minHeight = "40px";
-        this.style.width = "10vh";
-        this.style.minWidth = "40px";
-        this.style.borderRadius = "100px";
-        this.style.transition = "box-shadow 0.2s ease, background-color 0.2s ease";
-        this.style.boxShadow = "0 0 30px 1px #3c00ff";
     }
     draw() {
         this.style.transform = `translate(${this._position.x}px, ${this._position.y}px) rotate(${this.rotation}deg)`;
@@ -88,6 +81,7 @@ class Bullet extends GameObject {
         super();
         this.time = time;
         this.note = note;
+        this.pointWasGiven = false;
         this.main = Main.getInstance();
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec)) * this.speed));
         this.style.display = "flex";
@@ -117,6 +111,7 @@ class Main {
         this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
         this.audioPlayer = new AudioPlayer();
+        this.points = 0;
         this.bar = new Bar();
     }
     static getInstance() {
@@ -130,14 +125,13 @@ class Main {
         const body = document.querySelector('body');
         const menuContainer = document.createElement("div");
         menuContainer.setAttribute('id', 'menu-container');
-        menuContainer.setAttribute('style', 'height: 100vh; width: 100vw; z-index: 2; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center');
         const menu = document.createElement("div");
-        menu.setAttribute('style', 'display: flex; justify-content: center; padding: 10px; flex-direction: column; width: 40vw; height: 40vh; background: white; border-radius: 8px; align-items: center;');
+        menu.setAttribute('id', 'menu');
         const title = document.createElement("h1");
+        title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?';
-        title.setAttribute('style', 'font-size: 24px; text-align: center;');
         const button = document.createElement("button");
-        button.setAttribute('style', 'font-size: 24px; padding: 20px; height: 2em; line-height: 0; background: black; border-radius: 8px; color: white;');
+        button.setAttribute('class', 'button --start');
         button.innerText = "START";
         body === null || body === void 0 ? void 0 : body.appendChild(menuContainer);
         menuContainer.appendChild(menu);
@@ -149,7 +143,7 @@ class Main {
         });
         const pauseButton = document.createElement("button");
         pauseButton.innerText = "PAUSE";
-        pauseButton.setAttribute('style', 'position: absolute; top: 10px; font-size: 14px; padding: 8px; background: black; border-radius: 8px; color: white;');
+        pauseButton.setAttribute('class', 'button --pause');
         menuContainer.appendChild(pauseButton);
         pauseButton.addEventListener('click', () => {
             this.isPaused = !this.isPaused;
@@ -163,9 +157,6 @@ class Main {
                 this.timer.startTimer();
             }
         });
-        this.delayMonitor = document.createElement("h1");
-        this.delayMonitor.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0;');
-        menuContainer.appendChild(this.delayMonitor);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -187,7 +178,6 @@ class Main {
     }
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
-        this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
         if (this.delay <= -0.4 || this.delay >= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
             this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0, 2);
@@ -210,9 +200,8 @@ class Main {
         }
     }
     gameLoop() {
+        console.log(this.points);
         this.checkDelay();
-        if (this.timer.sec == 5) {
-        }
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
                 if (bullet !== otherBullet) {
@@ -222,21 +211,35 @@ class Main {
                         }
                         else {
                             bullet.style.backgroundColor = "#e2eaff";
-                            console.log(this.pitchdetect.note);
                             if (this.pitchdetect.note !== null) {
                                 if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === bullet.note) {
                                     bullet.style.backgroundColor = "#00ee00";
                                     bullet.style.boxShadow = "0 0 30px 1px #00ee00";
+                                    if (!bullet.pointWasGiven) {
+                                        this.points++;
+                                        bullet.pointWasGiven = true;
+                                    }
                                 }
                                 else if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] !== bullet.note) {
                                     bullet.style.backgroundColor = "red";
                                     bullet.style.boxShadow = "0 0 30px 1px red";
+                                    if (!bullet.pointWasGiven) {
+                                        this.points--;
+                                        bullet.pointWasGiven = true;
+                                    }
                                 }
                                 break;
                             }
                             else {
-                                bullet.style.backgroundColor = "#222222";
-                                bullet.style.boxShadow = "0 0 0 0";
+                                console.log(this.bar.clientHeight, bullet._position.y);
+                                if (bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
+                                    bullet.style.backgroundColor = "#222222";
+                                    bullet.style.boxShadow = "0 0 0 0";
+                                    if (!bullet.pointWasGiven) {
+                                        this.points -= 1;
+                                        bullet.pointWasGiven = true;
+                                    }
+                                }
                             }
                         }
                     }

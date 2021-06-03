@@ -4,11 +4,13 @@ class Bullet extends GameObject {
     public note: string
     public time: {min: string, sec: string, ms: string}
     private main: Main
+    public pointWasGiven: boolean
 
     constructor(note: string,  time: {min: string, sec: string, ms: string}) {
         super()
         this.time = time;
         this.note = note;
+        this.pointWasGiven = false;
 
         this.main = Main.getInstance()
 
