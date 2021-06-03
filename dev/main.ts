@@ -17,7 +17,7 @@ class Main {
     private messageboard : Messageboard
     private timer: Timer
     private isPaused: boolean = false
-    private notes: {title: string, time: string}[]
+    private notes: {title: string, time:  {min: string, sec: string, ms: string}}[]
     private bar: Bar
     private pitchdetect: PitchDetect 
     private delay: number
@@ -147,10 +147,11 @@ class Main {
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
         // console.log('delay:', delay);
-        
+        console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime%60 )
         this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
-        if(this.delay <= -0.4) {
+        if(this.delay <= -0.4 || this.delay>= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
+            this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
             console.log("fixed delay")
             this.fixCurrentPositions()
             this.spawnLateBullets()
@@ -166,8 +167,8 @@ class Main {
     spawnLateBullets() {
 
         for (const note of this.notes) {
-            console.log('note times', parseInt(note.time))
-            if((this.timer.sec - this.delay) > (parseInt(note.time) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time))) {
+            // console.log('note times', parseInt(note.time.sec))
+            if((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
                 if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
                     const newBullet = new Bullet(note.title, note.time)
                     this.bullets.push(newBullet)
@@ -198,9 +199,11 @@ class Main {
                 let hallo;
                 if(this.timer.sec < 10) {
                     // console.log(this.timer.sec)
-                   newSec =  this.timer.sec.substring(1)
+                   newSec =  this.timer.sec
+                //    console.log('newsec', newSec)
                 //    console.log(newSec)
-                   let hoi = parseInt(newSec,10)
+                //    let hoi = parseInt(newSec)
+                let hoi = newSec
                    hoi += 4;
                    if(hoi < 10) {
                        hallo = 0 +  hoi.toString() 
@@ -213,7 +216,7 @@ class Main {
 
                 // console.log(hallo)
                 // console.log(note.time)
-            if(note.time.toString() == (hallo+"."+this.timer.ms).toString()) {
+            if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString() && note.time.ms == this.timer.ms.toString()) {
                 console.log(note.title);
                 if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
                     this.bullets.push(new Bullet(note.title, note.time))

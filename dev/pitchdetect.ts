@@ -18,6 +18,7 @@ class PitchDetect extends  HTMLElement {
     public detune: any;
 
     public active: boolean;
+    private activeTime: number = 0;
 
     constructor() {
         super();
@@ -79,6 +80,7 @@ class PitchDetect extends  HTMLElement {
     }
 
     public activate() {
+        this.activeTime = 0;
         this.active = true;
         this.updatePitch();
     }
@@ -348,6 +350,7 @@ class PitchDetect extends  HTMLElement {
 
     public updatePitch() {
         // let cycles: any = new Array;
+    if(this.active && this.activeTime < 10) {
         if(this.analyser) {
 
             this.analyser.getFloatTimeDomainData( this.buf );
@@ -397,7 +400,7 @@ class PitchDetect extends  HTMLElement {
         //         this.detuneElem.className = "";
         //         this.detuneAmount.innerHTML = "--";
             } else {
-                console.log('detune: ', this.detune)
+                // console.log('detune: ', this.detune)
             }
         //  else {
         //         if (detune < 0)
@@ -406,13 +409,15 @@ class PitchDetect extends  HTMLElement {
         //             this.detuneElem.className = "sharp";
         //         this.detuneAmount.innerHTML = Math.abs( detune );
         //     }
-            console.log(this.pitch, 'hoi', this.noteStrings[this.note%12])
+            // console.log(this.pitch, 'hoi', this.noteStrings[this.note%12])
         }
 
-        if(this.active) {
-            setTimeout(() => {this.updatePitch()}, 19);
-            // setTimeout(() => {this.updatePitch()
-        }
+    
+        this.activeTime++
+        console.log(this.activeTime)
+        setTimeout(() => {this.updatePitch()}, 19);
+        // setTimeout(() => {this.updatePitch()
+    }
         // if (!window.requestAnimationFrame)
         //     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
         // this.rafID = window.requestAnimationFrame(this.updatePitch.bind(this));

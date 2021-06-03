@@ -38,7 +38,7 @@ class Timer extends HTMLElement {
        this.sec = this.sec + 1;
        this.ms = 0;
        }
-       if (this.sec == 60) {
+       if (this.sec == 60 && this.ms == 0) {
        this.min = this.min + 1;
        this.sec = 0;
        this.ms = 0;

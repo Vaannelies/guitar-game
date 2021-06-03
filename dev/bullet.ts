@@ -9,12 +9,12 @@ class Bullet extends GameObject {
     
     private previousHit     : boolean = false
     public note: string
-    public time: string
+    public time: {min: string, sec: string, ms: string}
 
     // Properties
     public set hit(value: boolean)  { this._hit = value     }
 
-    constructor(note: string, time: string) {
+    constructor(note: string,  time: {min: string, sec: string, ms: string}) {
         super()
         this.note = note;
         this.time = time;

@@ -231,9 +231,11 @@ class Main {
     }
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
+        console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime % 60);
         this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
-        if (this.delay <= -0.4) {
+        if (this.delay <= -0.4 || this.delay >= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
+            this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0, 2);
             console.log("fixed delay");
             this.fixCurrentPositions();
             this.spawnLateBullets();
@@ -246,8 +248,7 @@ class Main {
     }
     spawnLateBullets() {
         for (const note of this.notes) {
-            console.log('note times', parseInt(note.time));
-            if ((this.timer.sec - this.delay) > (parseInt(note.time) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time))) {
+            if ((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
                 if ((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
                     const newBullet = new Bullet(note.title, note.time);
                     this.bullets.push(newBullet);
@@ -264,8 +265,8 @@ class Main {
             let newSec;
             let hallo;
             if (this.timer.sec < 10) {
-                newSec = this.timer.sec.substring(1);
-                let hoi = parseInt(newSec, 10);
+                newSec = this.timer.sec;
+                let hoi = newSec;
                 hoi += 4;
                 if (hoi < 10) {
                     hallo = 0 + hoi.toString();
@@ -277,7 +278,7 @@ class Main {
             else {
                 hallo = this.timer.sec + 4;
             }
-            if (note.time.toString() == (hallo + "." + this.timer.ms).toString()) {
+            if (note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString() && note.time.ms == this.timer.ms.toString()) {
                 console.log(note.title);
                 if ((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
                     this.bullets.push(new Bullet(note.title, note.time));
@@ -327,6 +328,7 @@ class PitchDetect extends HTMLElement {
         this.theBuffer = null;
         this.DEBUGCANVAS = null;
         this.mediaStreamSource = null;
+        this.activeTime = 0;
         this.rafID = null;
         this.tracks = null;
         this.buflen = 2048;
@@ -340,6 +342,7 @@ class PitchDetect extends HTMLElement {
         console.log("liveinput)");
     }
     activate() {
+        this.activeTime = 0;
         this.active = true;
         this.updatePitch();
     }
@@ -451,25 +454,25 @@ class PitchDetect extends HTMLElement {
     }
     updatePitch() {
         var _a;
-        if (this.analyser) {
-            this.analyser.getFloatTimeDomainData(this.buf);
-        }
-        let ac = this.autoCorrelate(this.buf, (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.sampleRate);
-        if (ac == -1) {
-        }
-        else {
-            this.pitch = ac;
-            this.note = this.noteFromPitch(this.pitch);
-            this.detune = this.centsOffFromPitch(this.pitch, this.note);
-            if (this.detune == 0) {
-                console.log('perfect!');
+        if (this.active && this.activeTime < 10) {
+            if (this.analyser) {
+                this.analyser.getFloatTimeDomainData(this.buf);
+            }
+            let ac = this.autoCorrelate(this.buf, (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.sampleRate);
+            if (ac == -1) {
             }
             else {
-                console.log('detune: ', this.detune);
+                this.pitch = ac;
+                this.note = this.noteFromPitch(this.pitch);
+                this.detune = this.centsOffFromPitch(this.pitch, this.note);
+                if (this.detune == 0) {
+                    console.log('perfect!');
+                }
+                else {
+                }
             }
-            console.log(this.pitch, 'hoi', this.noteStrings[this.note % 12]);
-        }
-        if (this.active) {
+            this.activeTime++;
+            console.log(this.activeTime);
             setTimeout(() => { this.updatePitch(); }, 19);
         }
     }
@@ -508,7 +511,7 @@ class Timer extends HTMLElement {
                 this.sec = this.sec + 1;
                 this.ms = 0;
             }
-            if (this.sec == 60) {
+            if (this.sec == 60 && this.ms == 0) {
                 this.min = this.min + 1;
                 this.sec = 0;
                 this.ms = 0;
