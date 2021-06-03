@@ -9,13 +9,15 @@ class Bullet extends GameObject {
     
     private previousHit     : boolean = false
     public note: string
+    public time: string
 
     // Properties
     public set hit(value: boolean)  { this._hit = value     }
 
-    constructor(note: string) {
+    constructor(note: string, time: string) {
         super()
         this.note = note;
+        this.time = time;
         this.style.display = "flex";
         this.style.justifyContent = "center";
         this.style.alignItems = "center";
