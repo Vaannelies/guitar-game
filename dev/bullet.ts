@@ -10,14 +10,20 @@ class Bullet extends GameObject {
     private previousHit     : boolean = false
     public note: string
     public time: {min: string, sec: string, ms: string}
-
+    private main: Main
     // Properties
     public set hit(value: boolean)  { this._hit = value     }
 
     constructor(note: string,  time: {min: string, sec: string, ms: string}) {
         super()
-        this.note = note;
         this.time = time;
+        this.note = note;
+
+        this.main = Main.getInstance()
+
+        this._position =  new Vector(
+            Math.random() * window.innerWidth   - this.clientWidth, 
+            this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec)) * this.speed) )
         this.style.display = "flex";
         this.style.justifyContent = "center";
         this.style.alignItems = "center";
@@ -26,16 +32,36 @@ class Bullet extends GameObject {
         this.appendChild(banner)
         // this.captain = new Captain(this)
         // console.log(note)
+        this.moveBullet();
     }
 
     public update() {
+
         this.checkCollision()
 
         // this.captain.update()
 
-        super.update()
+        // super.update()
     }
 
+    public moveBullet() {
+        console.log(this.main.audioPlayer.audio.currentTime%60)
+        this._position.y =
+         (((this.main.audioPlayer.audio.currentTime%60) - (parseInt(this.time.sec) - 4)) * this.speed)
+    
+        // this._position.y += this.speed; 
+        this.draw()
+        // if(Ti)
+        // console.log(this.clientHeight)
+        setTimeout(() => {this.moveBullet()}, 100)
+    }
+    
+    
+    public draw() {
+        this.style.transform = `translate(${this._position.x}px, ${this._position.y}px) rotate(${this.rotation}deg)`
+    }
+
+    
     private checkCollision() {
         if(this._hit && !this.previousHit) {
             // this.captain.onCollision(++this.numberOfHits)

@@ -2,11 +2,13 @@
 
 class GameObject extends HTMLElement{
     // Fields
+
+    
     private static numberOfShips : number = 0
 
     public _position       : Vector 
     public speed           : number
-    private rotation        : number = 0
+    public rotation        : number = 0
     // private rotationSpeed   : number = 0
     
     // private counter         : number = 60hl 
@@ -24,11 +26,11 @@ class GameObject extends HTMLElement{
         // console.log("this.clientheight", this.clientHeight);
         // console.log('windowinnerheight', window.innerHeight)
 
+        this.speed      = ((document.getElementById('bar').getBoundingClientRect()?.top) / 4)
         this._position  = new Vector(
                             Math.random() * window.innerWidth   - this.clientWidth, 
-                            this.clientHeight)
+                            0)
         // this.speed      = ((window.innerHeight - document.getElementById('bar').getBoundingClientRect()?.height) / 200)
-        this.speed      = ((document.getElementById('bar').getBoundingClientRect()?.top) / 40)
         this.rotation   = 0
         // console.log(document.getElementById('bar').getBoundingClientRect())
         this.createShip()
@@ -50,16 +52,17 @@ class GameObject extends HTMLElement{
         this.style.boxShadow = "0 0 30px 1px #3c00ff";
 
         this._color = this.colors[GameObject.numberOfShips - 1]
-        this.moveBullet();
+        // this.moveBullet();
         
     }
 
-    public moveBullet() {
-        this._position.y += this.speed; 
-        this.draw()
-        // if(Ti)
-        setTimeout(() => {this.moveBullet()}, 100)
-    }
+    // public moveBullet() {
+    //     this._position.y += this.speed; 
+    //     this.draw()
+    //     // if(Ti)
+    //     // console.log(this.clientHeight)
+    //     setTimeout(() => {this.moveBullet()}, 100)
+    // }
     
     public update() {
         // this._position.y += this.speed; 
@@ -92,7 +95,7 @@ class GameObject extends HTMLElement{
     //     if(this._position.y > window.innerHeight)    this._position.y = 0
     // }
 
-    private draw() {
+    public draw() {
         this.style.transform = `translate(${this._position.x}px, ${this._position.y}px) rotate(${this.rotation}deg)`
     }
 

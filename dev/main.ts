@@ -12,7 +12,7 @@
 
 class Main {
     // const Stopwatch = requestAnimationFrame()
-    private audioPlayer: AudioPlayer
+    public  audioPlayer: AudioPlayer
     private bullets : Bullet[] = []
     private messageboard : Messageboard
     private timer: Timer
@@ -22,20 +22,23 @@ class Main {
     private pitchdetect: PitchDetect 
     private delay: number
     private delayMonitor: HTMLElement
+    private static instance: Main
 
 
 // public stopwatch: any;
 
 
 
-    constructor() {
+   private constructor() {
         // this.stopwatch = new Stopwatch();
         // this.stopwatch.start();
         // console.log(this.stopwatch.getTime())
         // this.stopwatch.stop();
+        Main.instance = this;
         this.createMenu();
         this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
+        this.audioPlayer = new AudioPlayer();
         // console.log(pitchdetect)
         // this.pitchdetect.updatePitch()
 
@@ -45,6 +48,14 @@ class Main {
 
         
     
+    }
+
+    public static getInstance(): Main {
+        if(!Main.instance) {
+            console.log('new main')
+            Main.instance = new Main();
+        }
+        return this.instance;
     }
 
     createMenu() {
@@ -101,7 +112,6 @@ class Main {
 
 
         this.timer.startTimer();
-        this.audioPlayer = new AudioPlayer();
         this.audioPlayer.play();
         // for (let i = 0; i < 10; i++) {
         //     this.bullets.push(new Bullet())
@@ -135,6 +145,9 @@ class Main {
         //         note.time = (parseInt(note.time, 10) - 4 ).toString() + ".00"
         //     }
         // })
+        this.notes.forEach(note => {
+            this.bullets.push(new Bullet(note.title, note.time))
+        })
         this.gameLoop()
     }
     
@@ -153,14 +166,16 @@ class Main {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
             this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
             console.log("fixed delay")
-            this.fixCurrentPositions()
-            this.spawnLateBullets()
+            // this.fixCurrentPositions()
+            // this.spawnLateBullets()
         }
     }
 
     fixCurrentPositions() {
         for (const ship of this.bullets) {
-            ship._position.y = ship._position.y + ship.speed * this.delay * 100
+            // ship._position.y = ship._position.y + ship.speed * (this.timer.sec - parseInt(ship.time.sec))
+            ship._position.y = ship.clientHeight + ship.speed * (this.timer.sec - parseInt(ship.time.sec))
+            // ship._position.y = ship._position.y + ship.speed * this.delay * 100
         }  
     }
     
@@ -191,42 +206,44 @@ class Main {
 
         
 
-        this.notes.forEach(note => {
-                // console.log('time', note.time.toString())
-                // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
-                // console.log(this.timer.sec+4)
-                let newSec;
-                let hallo;
-                if(this.timer.sec < 10) {
-                    // console.log(this.timer.sec)
-                   newSec =  this.timer.sec
-                //    console.log('newsec', newSec)
-                //    console.log(newSec)
-                //    let hoi = parseInt(newSec)
-                let hoi = newSec
-                   hoi += 4;
-                   if(hoi < 10) {
-                       hallo = 0 +  hoi.toString() 
-                   } else {
-                       hallo = hoi.toString()
-                   }
-                } else {
-                    hallo = this.timer.sec + 4
-                }
+        // this.notes.forEach(note => {
+        //         // console.log('time', note.time.toString())
+        //         // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
+        //         // console.log(this.timer.sec+4)
+        //         let newSec;
+        //         let hallo;
+        //         if(this.timer.sec < 10) {
+        //             // console.log(this.timer.sec)
+        //            newSec =  this.timer.sec
+        //         //    console.log('newsec', newSec)
+        //         //    console.log(newSec)
+        //         //    let hoi = parseInt(newSec)
+        //         let hoi = newSec
+        //            hoi += 4;
+        //            if(hoi < 10) {
+        //                hallo = 0 +  hoi.toString() 
+        //            } else {
+        //                hallo = hoi.toString()
+        //            }
+        //         } else {
+        //             hallo = this.timer.sec + 4
+        //         }
 
-                // console.log(hallo)
-                // console.log(note.time)
-            if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString() && note.time.ms == this.timer.ms.toString()) {
-                console.log(note.title);
-                if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
-                    this.bullets.push(new Bullet(note.title, note.time))
-                }
-            }
-        })
+        //         // console.log(hallo)
+        //         // console.log(note.time)
+        //     if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString()) {
+        //     // if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString() && note.time.ms == this.timer.ms.toString()) {
+        //         console.log(note.title);
+        //         if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
+        //             this.bullets.push(new Bullet(note.title, note.time))
+        //         }
+        //     }
+        // })
       
         // G# D# F G# C A# C A# G# C A# C C C G# G# G# G# A# C A# G G# G C A# G# C A# G# D# C A# G# G#
         for (const ship of this.bullets) {
-            ship.update()
+            // ship.update()
+            // ship._position.y = ship.clientHeight + ship.speed * 1 * parseInt((this.audioPlayer.audio.currentTime.toString().split(".")[1]).substring(0,2))
 
             for (const otherShip of this.bullets) {
                 if(ship !== otherShip) {
