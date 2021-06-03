@@ -8,8 +8,8 @@ class Main {
     private bar: Bar
     private pitchdetect: PitchDetect 
     private delay: number
-    private delayMonitor: HTMLElement
     private static instance: Main
+    private counter: HTMLElement
     private points: number;
 
 
@@ -75,6 +75,11 @@ class Main {
                 this.timer.startTimer();
             }
         })
+
+        this.counter = document.createElement('div')
+        document.getElementById('menu-container')?.appendChild(this.counter)
+        this.counter.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; right: 0;')
+ 
     }
 
     async start() {
@@ -170,6 +175,7 @@ class Main {
                 }
             }
         }
+        this.counter.innerText = this.points.toString();
         if(!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop())
         }

@@ -11,7 +11,7 @@ class Timer extends HTMLElement {
         super()
         this.timer = document.createElement('div')
         document.getElementById('menu-container')?.appendChild(this.timer)
-        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0;')
+        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 0;')
     }
 
     startTimer() {

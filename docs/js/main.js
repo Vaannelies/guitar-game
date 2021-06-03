@@ -122,6 +122,7 @@ class Main {
         return this.instance;
     }
     createMenu() {
+        var _a;
         const body = document.querySelector('body');
         const menuContainer = document.createElement("div");
         menuContainer.setAttribute('id', 'menu-container');
@@ -157,6 +158,9 @@ class Main {
                 this.timer.startTimer();
             }
         });
+        this.counter = document.createElement('div');
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.counter);
+        this.counter.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; right: 0;');
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -251,6 +255,7 @@ class Main {
                 }
             }
         }
+        this.counter.innerText = this.points.toString();
         if (!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop());
         }
@@ -427,7 +432,7 @@ class Timer extends HTMLElement {
         this.stoptime = true;
         this.timer = document.createElement('div');
         (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.timer);
-        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0;');
+        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 0;');
     }
     startTimer() {
         if (this.stoptime == true) {
