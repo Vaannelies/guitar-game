@@ -231,8 +231,8 @@ class Main {
     }
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
-        this.delayMonitor.innerHTML = this.delay.toString();
-        if (this.delay <= -1) {
+        this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
+        if (this.delay <= -0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
             console.log("fixed delay");
             this.fixCurrentPositions();
@@ -279,7 +279,9 @@ class Main {
             }
             if (note.time.toString() == (hallo + "." + this.timer.ms).toString()) {
                 console.log(note.title);
-                this.bullets.push(new Bullet(note.title, note.time));
+                if ((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
+                    this.bullets.push(new Bullet(note.title, note.time));
+                }
             }
         });
         for (const ship of this.bullets) {
