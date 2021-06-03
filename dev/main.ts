@@ -1,20 +1,7 @@
-/// <reference path="messageboard.ts"/>
-// / <reference path="pitchdetect.ts"/>
-
-// import PitchDetect from "./pitchdetect";
-// import * as data from '../docs/notes/perfect.json'
-
-// import { Stopwatch } from "ts-stopwatch";
-// import PitchDetect from './pitchdetect';
-// const Stopwatch = require("ts-stopwatch").Stopwatch;
-
-// const Stopwatch = require("ts-stopwatch").Stopwatch;
-
 class Main {
     // const Stopwatch = requestAnimationFrame()
     public  audioPlayer: AudioPlayer
     private bullets : Bullet[] = []
-    private messageboard : Messageboard
     private timer: Timer
     private isPaused: boolean = false
     private notes: {title: string, time:  {min: string, sec: string, ms: string}}[]
@@ -25,16 +12,7 @@ class Main {
     private static instance: Main
 
 
-// public stopwatch: any;
-
-
-
    private constructor() {
-        // this.stopwatch = new Stopwatch();
-        // this.stopwatch.start();
-        // console.log(this.stopwatch.getTime())
-        // this.stopwatch.stop();
-        Main.instance = this;
         this.createMenu();
         this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
@@ -64,7 +42,6 @@ class Main {
         const menuContainer = document.createElement("div");
         menuContainer.setAttribute('id', 'menu-container');
         menuContainer.setAttribute('style', 'height: 100vh; width: 100vw; z-index: 2; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center');
-        // body?.setAttribute('style', 'display: flex; align-items: center;')
         const menu = document.createElement("div");
 
         menu.setAttribute('style', 'display: flex; justify-content: center; padding: 10px; flex-direction: column; width: 40vw; height: 40vh; background: white; border-radius: 8px; align-items: center;');
@@ -98,7 +75,6 @@ class Main {
                 this.gameLoop();
                 this.timer.startTimer();
             }
-            // console.log('paused:', this.isPaused)
         })
 
         this.delayMonitor = document.createElement("h1");
@@ -108,43 +84,10 @@ class Main {
 
     async start() {
         await this.fetchNotesForSong();
-        // console.log("notes", this.notes)
-
-
+      
         this.timer.startTimer();
         this.audioPlayer.play();
-        // for (let i = 0; i < 10; i++) {
-        //     this.bullets.push(new Bullet())
-        // }
-   
-        // Eventueel Messageboard aanmaken zodat deze zichtbaar wordt?
-        this.messageboard = Messageboard.getInstance()
-        // console.log(this.messageboard)
-
-        // pitchdetect.toggleLiveInput();
-
-        
-        // this.notes.forEach(note => {
-        //     // console.log('time', note.time.toString())
-        //     // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
-        //     // console.log(this.timer.sec+4)
-        //     let newSec;
-        //     let hallo;
-        //     if(this.timer.sec < 10) {
-        //         // console.log(this.timer.sec)
-        //        newSec =  note.time.substring(1)
-        //     //    console.log(newSec)
-        //        let hoi = parseInt(newSec,10)
-        //        hoi -= 4;
-        //        if(hoi < 10) {
-        //            note.time = 0 +  hoi.toString() + ".00"
-        //        } else {
-        //            note.time = hoi.toString() + ".00"
-        //        }
-        //     } else {
-        //         note.time = (parseInt(note.time, 10) - 4 ).toString() + ".00"
-        //     }
-        // })
+  
         this.notes.forEach(note => {
             this.bullets.push(new Bullet(note.title, note.time))
         })
@@ -159,23 +102,16 @@ class Main {
 
     checkDelay() {
         this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
-        // console.log('delay:', delay);
-        // console.log("timer sec", this.timer.sec, "currentimesec", this.audioPlayer.audio.currentTime%60 )
         this.delayMonitor.innerHTML = this.audioPlayer.audio.currentTime.toString();
         if(this.delay <= -0.4 || this.delay>= 0.4) {
             this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
             this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
-            // console.log("fixed delay")
-            // this.fixCurrentPositions()
-            // this.spawnLateBullets()
         }
     }
 
     fixCurrentPositions() {
-        for (const ship of this.bullets) {
-            // ship._position.y = ship._position.y + ship.speed * (this.timer.sec - parseInt(ship.time.sec))
-            ship._position.y = ship.clientHeight + ship.speed * (this.timer.sec - parseInt(ship.time.sec))
-            // ship._position.y = ship._position.y + ship.speed * this.delay * 100
+        for (const bullet of this.bullets) {
+            bullet._position.y = bullet.clientHeight + bullet.speed * (this.timer.sec - parseInt(bullet.time.sec))
         }  
     }
     
@@ -204,81 +140,40 @@ class Main {
             // console.log("het is 5 lol");
         }
 
-        
+    
+       for (const bullet of this.bullets) {
 
-        // this.notes.forEach(note => {
-        //         // console.log('time', note.time.toString())
-        //         // console.log('timer time', (this.timer.sec+"."+this.timer.ms).toString())
-        //         // console.log(this.timer.sec+4)
-        //         let newSec;
-        //         let hallo;
-        //         if(this.timer.sec < 10) {
-        //             // console.log(this.timer.sec)
-        //            newSec =  this.timer.sec
-        //         //    console.log('newsec', newSec)
-        //         //    console.log(newSec)
-        //         //    let hoi = parseInt(newSec)
-        //         let hoi = newSec
-        //            hoi += 4;
-        //            if(hoi < 10) {
-        //                hallo = 0 +  hoi.toString() 
-        //            } else {
-        //                hallo = hoi.toString()
-        //            }
-        //         } else {
-        //             hallo = this.timer.sec + 4
-        //         }
-
-        //         // console.log(hallo)
-        //         // console.log(note.time)
-        //     if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString()) {
-        //     // if(note.time.sec == hallo.toString() && note.time.min === this.timer.min.toString() && note.time.ms == this.timer.ms.toString()) {
-        //         console.log(note.title);
-        //         if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
-        //             this.bullets.push(new Bullet(note.title, note.time))
-        //         }
-        //     }
-        // })
-      
-        // G# D# F G# C A# C A# G# C A# C C C G# G# G# G# A# C A# G G# G C A# G# C A# G# D# C A# G# G#
-        for (const ship of this.bullets) {
-            // ship.update()
-            // ship._position.y = ship.clientHeight + ship.speed * 1 * parseInt((this.audioPlayer.audio.currentTime.toString().split(".")[1]).substring(0,2))
-
-            for (const otherShip of this.bullets) {
-                if(ship !== otherShip) {
-                    if(ship.hasCollision(this.bar)) {
+            for (const otherBullet of this.bullets) {
+                if(bullet !== otherBullet) {
+                    if(bullet.hasCollision(this.bar)) {
                         if(!this.pitchdetect.active) {
                             this.pitchdetect.activate()
                         } else {
-
-                            ship.hit = true
-                            ship.style.backgroundColor = "#e2eaff";
-                            // console.log(ship.note, this.timer.sec, ":", this.timer.ms)
+                            bullet.style.backgroundColor = "#e2eaff";
+                            // console.log(bullet.note, this.timer.sec, ":", this.timer.ms)
                             // break inner loop to prevent overwriting the hit
                             console.log(this.pitchdetect.note)
-                            // console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], ship.note)
+                            // console.log('collision', this.pitchdetect.noteStrings[this.pitchdetect.note%12], bullet.note)
                             if(this.pitchdetect.note !== null) {
                             // if(this.pitchdetect.noteStrings.indexOf(this.pitchdetect.note%12)) {
-                                if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === ship.note) {
-                                    ship.style.backgroundColor = "#00ee00";
-                                    ship.style.boxShadow = "0 0 30px 1px #00ee00";
+                                if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === bullet.note) {
+                                    bullet.style.backgroundColor = "#00ee00";
+                                    bullet.style.boxShadow = "0 0 30px 1px #00ee00";
                                 }
-                                else if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] !== ship.note) {
-                                    ship.style.backgroundColor = "red";
-                                    ship.style.boxShadow = "0 0 30px 1px red";
+                                else if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] !== bullet.note) {
+                                    bullet.style.backgroundColor = "red";
+                                    bullet.style.boxShadow = "0 0 30px 1px red";
                                 }
                                 break
                             } else {
-                                ship.style.backgroundColor = "#222222";
-                                ship.style.boxShadow = "0 0 0 0";
+                                bullet.style.backgroundColor = "#222222";
+                                bullet.style.boxShadow = "0 0 0 0";
                             }
                         }
                     }
                     else {
-                        ship.style.boxShadow = "0 0 30px 1px #3c00ff";
-                        ship.style.backgroundColor = "white";
-                        ship.hit = false
+                        bullet.style.boxShadow = "0 0 30px 1px #3c00ff";
+                        bullet.style.backgroundColor = "white";
                         this.pitchdetect.active = false
                     }
                 }
@@ -289,14 +184,7 @@ class Main {
         }
     }
 
-
-
-
-
-
- 
-
 }
 
-window.addEventListener("load", () => new Main())
+window.addEventListener("load", () => Main.getInstance())
 

@@ -18,7 +18,6 @@ class Bullet extends GameObject {
             this.captain.onCollision(++this.numberOfHits);
             let times = this.numberOfHits == 1 ? "time" : "times";
             console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
-            Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`);
         }
         this.previousHit = this._hit;
     }
