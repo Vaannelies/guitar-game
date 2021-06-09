@@ -11,6 +11,7 @@ class Main {
     private static instance: Main
     private counter: HTMLElement
     private points: number;
+    private scoreboard: Scoreboard;
 
 
    private constructor() {
@@ -32,7 +33,7 @@ class Main {
 
     public static getInstance(): Main {
         if(!Main.instance) {
-            console.log('new main')
+            // console.log('new main')
             Main.instance = new Main();
         }
         return this.instance;
@@ -76,9 +77,11 @@ class Main {
             }
         })
 
-        this.counter = document.createElement('div')
-        document.getElementById('menu-container')?.appendChild(this.counter)
-        this.counter.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; right: 0;')
+        this.scoreboard = new Scoreboard()
+        // this.counter = document.createElement('div')
+        // document.getElementById('menu-container')?.appendChild(this.counter)
+        document.getElementById('menu-container')?.appendChild(this.scoreboard);
+   
  
     }
 
@@ -126,7 +129,7 @@ class Main {
     }
 
     gameLoop() {
-        console.log(this.points)
+        // console.log(this.points)
         this.checkDelay()
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
@@ -135,32 +138,37 @@ class Main {
                         if(!this.pitchdetect.active) {
                             this.pitchdetect.activate()
                         } else {
-                            bullet.style.backgroundColor = "#e2eaff";
+                            if(!bullet.pointWasGiven) {
+                                bullet.style.backgroundColor = "#e2eaff";
+                            }
                             if(this.pitchdetect.note !== null) {
                                 if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === bullet.note) {
-                                    bullet.style.backgroundColor = "#00ee00";
-                                    bullet.style.boxShadow = "0 0 30px 1px #00ee00";
                                     if(!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "#00ee00";
+                                        bullet.style.boxShadow = "0 0 30px 1px #00ee00";
                                         this.points++;
+                                        this.scoreboard.setScore(this.points)
                                         bullet.pointWasGiven = true;
                                     }
                                 }
                                 else if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] !== bullet.note) {
-                                    bullet.style.backgroundColor = "red";
-                                    bullet.style.boxShadow = "0 0 30px 1px red";
                                     if(!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "red";
+                                        bullet.style.boxShadow = "0 0 30px 1px red";
                                         this.points--;
+                                        this.scoreboard.setScore(this.points)
                                         bullet.pointWasGiven = true;
                                     }
                                 }
                                 break
                             } else { 
-                                console.log(this.bar.clientHeight, bullet._position.y)
+                                // console.log(this.bar.clientHeight, bullet._position.y)
                                 if(bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
-                                    bullet.style.backgroundColor = "#222222";
-                                    bullet.style.boxShadow = "0 0 0 0";
                                     if(!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "#222222";
+                                        bullet.style.boxShadow = "0 0 0 0";
                                         this.points -= 1;
+                                        this.scoreboard.setScore(this.points)
                                         bullet.pointWasGiven = true;
                                     }
                                 }
@@ -175,7 +183,6 @@ class Main {
                 }
             }
         }
-        this.counter.innerText = this.points.toString();
         if(!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop())
         }

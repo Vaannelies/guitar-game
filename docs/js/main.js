@@ -83,7 +83,7 @@ class Bullet extends GameObject {
         this.note = note;
         this.pointWasGiven = false;
         this.main = Main.getInstance();
-        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec)) * this.speed));
+        this._position = new Vector((Math.random() * window.innerWidth - this.clientWidth) + this.clientWidth, this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec)) * this.speed));
         this.style.display = "flex";
         this.style.justifyContent = "center";
         this.style.alignItems = "center";
@@ -116,7 +116,6 @@ class Main {
     }
     static getInstance() {
         if (!Main.instance) {
-            console.log('new main');
             Main.instance = new Main();
         }
         return this.instance;
@@ -158,9 +157,8 @@ class Main {
                 this.timer.startTimer();
             }
         });
-        this.counter = document.createElement('div');
-        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.counter);
-        this.counter.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; right: 0;');
+        this.scoreboard = new Scoreboard();
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.scoreboard);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -204,7 +202,6 @@ class Main {
         }
     }
     gameLoop() {
-        console.log(this.points);
         this.checkDelay();
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
@@ -214,33 +211,37 @@ class Main {
                             this.pitchdetect.activate();
                         }
                         else {
-                            bullet.style.backgroundColor = "#e2eaff";
+                            if (!bullet.pointWasGiven) {
+                                bullet.style.backgroundColor = "#e2eaff";
+                            }
                             if (this.pitchdetect.note !== null) {
                                 if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === bullet.note) {
-                                    bullet.style.backgroundColor = "#00ee00";
-                                    bullet.style.boxShadow = "0 0 30px 1px #00ee00";
                                     if (!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "#00ee00";
+                                        bullet.style.boxShadow = "0 0 30px 1px #00ee00";
                                         this.points++;
+                                        this.scoreboard.setScore(this.points);
                                         bullet.pointWasGiven = true;
                                     }
                                 }
                                 else if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] !== bullet.note) {
-                                    bullet.style.backgroundColor = "red";
-                                    bullet.style.boxShadow = "0 0 30px 1px red";
                                     if (!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "red";
+                                        bullet.style.boxShadow = "0 0 30px 1px red";
                                         this.points--;
+                                        this.scoreboard.setScore(this.points);
                                         bullet.pointWasGiven = true;
                                     }
                                 }
                                 break;
                             }
                             else {
-                                console.log(this.bar.clientHeight, bullet._position.y);
                                 if (bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
-                                    bullet.style.backgroundColor = "#222222";
-                                    bullet.style.boxShadow = "0 0 0 0";
                                     if (!bullet.pointWasGiven) {
+                                        bullet.style.backgroundColor = "#222222";
+                                        bullet.style.boxShadow = "0 0 0 0";
                                         this.points -= 1;
+                                        this.scoreboard.setScore(this.points);
                                         bullet.pointWasGiven = true;
                                     }
                                 }
@@ -255,7 +256,6 @@ class Main {
                 }
             }
         }
-        this.counter.innerText = this.points.toString();
         if (!this.isPaused) {
             requestAnimationFrame(() => this.gameLoop());
         }
@@ -422,6 +422,41 @@ class PitchDetect extends HTMLElement {
     }
 }
 window.customElements.define("pitchdetect-component", PitchDetect);
+class Scoreboard extends HTMLElement {
+    constructor() {
+        super();
+        this.score = 0;
+        this.scoreIncreases = false;
+        this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px;');
+        this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`;
+    }
+    setScore(score) {
+        this.scoreIncreases = score > this.score;
+        this.score = score;
+        this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`;
+        this.changeColor(this.scoreIncreases);
+        setTimeout(() => {
+            this.style.color = "white";
+        }, 500);
+    }
+    getScore() {
+        return this.score;
+    }
+    changeColor(positive) {
+        if (positive) {
+            this.style.color = "green";
+            if (((this.score).toString().length > 1) &&
+                ((this.score) > 0) &&
+                (parseInt((this.score).toString().slice(-1)) === 0)) {
+                this.style.color = "yellow";
+            }
+        }
+        else {
+            this.style.color = "red";
+        }
+    }
+}
+window.customElements.define("scoreboard-component", Scoreboard);
 class Timer extends HTMLElement {
     constructor() {
         var _a;
@@ -430,9 +465,9 @@ class Timer extends HTMLElement {
         this.sec = 0;
         this.ms = 0;
         this.stoptime = true;
-        this.timer = document.createElement('div');
+        this.timer = document.createElement('h2');
         (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.timer);
-        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 0;');
+        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;');
     }
     startTimer() {
         if (this.stoptime == true) {

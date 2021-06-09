@@ -15,7 +15,7 @@ class Bullet extends GameObject {
         this.main = Main.getInstance()
 
         this._position =  new Vector(
-            Math.random() * window.innerWidth   - this.clientWidth, 
+            (Math.random() * window.innerWidth   - this.clientWidth) + this.clientWidth, 
             this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec) ) * this.speed) )
         this.style.display = "flex";
         this.style.justifyContent = "center";
