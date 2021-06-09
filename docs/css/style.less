@@ -51,10 +51,10 @@ message {
 #menu {
     display: flex;
     justify-content: center;
-    padding: 10px;
+    padding: 25px;
     flex-direction: column;
-    width: 40vw;
-    height: 40vh;
+    height: fit-content; 
+    width: fit-content; 
     background: white;
     border-radius: 8px;
     align-items: center;
@@ -91,6 +91,36 @@ message {
         padding: 8px;
         font-size: 14px;
         position: absolute;
-        top: 10px;
+        top: 1.5em;
     }
+}
+
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    border-radius:8px; 
+    background-color: white; 
+    height: fit-content; 
+    width: fit-content; 
+    z-index: 1; 
+    color: white;
+
+    button {
+        background: black;
+        border-radius: 8px;
+        color: white;
+        padding: 20px;
+        font-size: 24px;
+        height: 2em;
+        line-height: 0;
+    }
+    
+    .stop {
+        background: rgb(109, 1, 1);
+    }
+}
+
+h2 {
+    width: 30vw;
 }

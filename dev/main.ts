@@ -9,41 +9,32 @@ class Main {
     private pitchdetect: PitchDetect 
     private delay: number
     private static instance: Main
-    private counter: HTMLElement
     private points: number;
     private scoreboard: Scoreboard;
+    private pauseButton: HTMLElement
+    private pauseMenu: PauseMenu
+    private menuContainer: HTMLElement
 
 
    private constructor() {
+        this.menuContainer = document.createElement("div");
+        this.menuContainer.setAttribute('id', 'menu-container');
+        document.body?.appendChild(this.menuContainer);
         this.createMenu();
-        this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
         this.audioPlayer = new AudioPlayer();
-        // console.log(pitchdetect)
-        // this.pitchdetect.updatePitch()
         this.points = 0;
-
         this.bar = new Bar();
-        // console.log(this.bar)
-
-
-        
-    
     }
 
     public static getInstance(): Main {
         if(!Main.instance) {
-            // console.log('new main')
             Main.instance = new Main();
         }
         return this.instance;
     }
 
     createMenu() {
-        
-        const body = document.querySelector('body');
-        const menuContainer = document.createElement("div");
-        menuContainer.setAttribute('id', 'menu-container');
         const menu = document.createElement("div");
         menu.setAttribute('id', 'menu');
         const title = document.createElement("h1");
@@ -52,8 +43,8 @@ class Main {
         const button = document.createElement("button");
         button.setAttribute('class', 'button --start')
         button.innerText = "START";
-        body?.appendChild(menuContainer);
-        menuContainer.appendChild(menu)
+
+        this.menuContainer.appendChild(menu)
         menu.appendChild(title)
         menu.appendChild(button)
         button.addEventListener('click', () => {
@@ -61,38 +52,56 @@ class Main {
             this.start();
         })
         
-        const pauseButton = document.createElement("button");
-        pauseButton.innerText = "PAUSE";
-        pauseButton.setAttribute('class', 'button --pause')
-        menuContainer.appendChild(pauseButton)
-        pauseButton.addEventListener('click', () => {
-            this.isPaused = !this.isPaused
-            if(this.isPaused) {
-                this.audioPlayer.pause();
-                this.timer.stopTimer();
-            } else {
-                this.audioPlayer.play();
-                this.gameLoop();
-                this.timer.startTimer();
-            }
-        })
-
-        this.scoreboard = new Scoreboard()
-        // this.counter = document.createElement('div')
-        // document.getElementById('menu-container')?.appendChild(this.counter)
-        document.getElementById('menu-container')?.appendChild(this.scoreboard);
-   
- 
     }
-
+    
     async start() {
         await this.fetchNotesForSong();
+        this.timer = new Timer();
         this.timer.startTimer();
         this.audioPlayer.play();
+        this.scoreboard = new Scoreboard()
+        this.scoreboard.setScore(0)
+
+        this.pauseButton = document.createElement("button");
+        this.pauseButton.innerText = "PAUSE";
+        this.pauseButton.setAttribute('class', 'button --pause')
+        this.menuContainer.appendChild(this.pauseButton)
+        this.pauseButton.addEventListener('click', ()=>{this.pauseGame()})
+
         this.notes.forEach(note => {
             this.bullets.push(new Bullet(note.title, note.time))
         })
         this.gameLoop()
+    }
+
+    pauseGame() {
+        this.isPaused = !this.isPaused
+        if(this.isPaused) {
+            this.audioPlayer.pause();
+            this.timer.stopTimer();
+            this.pauseMenu = new PauseMenu()
+        } else {
+            this.audioPlayer.play();
+            this.gameLoop();
+            this.timer.startTimer();
+            this.pauseMenu.remove();
+        }
+    }
+
+    stopGame() {
+        console.log('hoi')
+        this.points = 0;
+        this.isPaused = false;
+        this.bullets.forEach(bullet => {
+            bullet.remove();
+        })
+        this.scoreboard.remove()
+        this.pauseButton.remove()
+        this.timer.remove()
+        this.bullets = []
+        this.notes = []
+        this.audioPlayer.stop()
+        this.createMenu()
     }
     
     async fetchNotesForSong() {
@@ -101,36 +110,36 @@ class Main {
             .then(json => {this.notes = json.notes });
     }
 
-    checkDelay() {
-        this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
-        if(this.delay <= -0.4 || this.delay>= 0.4) {
-            this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
-            this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
-        }
-    }
+    // checkDelay() {
+    //     this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
+    //     if(this.delay <= -0.4 || this.delay>= 0.4) {
+    //         this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
+    //         this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
+    //     }
+    // }
 
-    fixCurrentPositions() {
-        for (const bullet of this.bullets) {
-            bullet._position.y = bullet.clientHeight + bullet.speed * (this.timer.sec - parseInt(bullet.time.sec))
-        }  
-    }
+    // fixCurrentPositions() {
+    //     for (const bullet of this.bullets) {
+    //         bullet._position.y = bullet.clientHeight + bullet.speed * (this.timer.sec - parseInt(bullet.time.sec))
+    //     }  
+    // }
     
-    spawnLateBullets() {
+    // spawnLateBullets() {
 
-        for (const note of this.notes) {
-            if((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
-                if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
-                    const newBullet = new Bullet(note.title, note.time)
-                    this.bullets.push(newBullet)
-                    newBullet._position.y = newBullet.speed * this.delay * 100
-                }
-            }
-        }  
-    }
+    //     for (const note of this.notes) {
+    //         if((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
+    //             if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
+    //                 const newBullet = new Bullet(note.title, note.time)
+    //                 this.bullets.push(newBullet)
+    //                 newBullet._position.y = newBullet.speed * this.delay * 100
+    //             }
+    //         }
+    //     }  
+    // }
 
     gameLoop() {
         // console.log(this.points)
-        this.checkDelay()
+        // this.checkDelay()
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
                 if(bullet !== otherBullet) {

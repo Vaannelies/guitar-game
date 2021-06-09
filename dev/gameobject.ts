@@ -11,19 +11,21 @@ class GameObject extends HTMLElement {
 
     constructor() {
         super()
-
+        
         this.speed = ((document.getElementById('bar').getBoundingClientRect()?.top) / 4)
-        this._position  = new Vector(
-                            Math.random() * window.innerWidth   - this.clientWidth, 
-                            0)
+        this._position  = new Vector(0, 0)
         this.rotation = 0
         this.createBullet()
     }
-
+                        
     private createBullet() {
         let game = document.getElementsByTagName("game")[0]
         this.setAttribute('class', 'bullet')
         game.appendChild(this)
+        console.log("window innerwidth", window.innerWidth, "this.clientWidth", this.clientWidth)
+        this._position  = new Vector(
+                            Math.random() * window.innerWidth   - this.clientWidth, 
+                            0)
 
         GameObject.numberOfBullets++
         if(GameObject.numberOfBullets > 6) GameObject.numberOfBullets = 1

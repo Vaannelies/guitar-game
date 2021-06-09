@@ -42,7 +42,7 @@ class GameObject extends HTMLElement {
         super();
         this.rotation = 0;
         this.speed = (((_a = document.getElementById('bar').getBoundingClientRect()) === null || _a === void 0 ? void 0 : _a.top) / 4);
-        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, 0);
+        this._position = new Vector(0, 0);
         this.rotation = 0;
         this.createBullet();
     }
@@ -51,6 +51,8 @@ class GameObject extends HTMLElement {
         let game = document.getElementsByTagName("game")[0];
         this.setAttribute('class', 'bullet');
         game.appendChild(this);
+        console.log("window innerwidth", window.innerWidth, "this.clientWidth", this.clientWidth);
+        this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, 0);
         GameObject.numberOfBullets++;
         if (GameObject.numberOfBullets > 6)
             GameObject.numberOfBullets = 1;
@@ -105,10 +107,13 @@ class Bullet extends GameObject {
 window.customElements.define("bullet-component", Bullet);
 class Main {
     constructor() {
+        var _a;
         this.bullets = [];
         this.isPaused = false;
+        this.menuContainer = document.createElement("div");
+        this.menuContainer.setAttribute('id', 'menu-container');
+        (_a = document.body) === null || _a === void 0 ? void 0 : _a.appendChild(this.menuContainer);
         this.createMenu();
-        this.timer = new Timer();
         this.pitchdetect = new PitchDetect();
         this.audioPlayer = new AudioPlayer();
         this.points = 0;
@@ -121,10 +126,6 @@ class Main {
         return this.instance;
     }
     createMenu() {
-        var _a;
-        const body = document.querySelector('body');
-        const menuContainer = document.createElement("div");
-        menuContainer.setAttribute('id', 'menu-container');
         const menu = document.createElement("div");
         menu.setAttribute('id', 'menu');
         const title = document.createElement("h1");
@@ -133,43 +134,61 @@ class Main {
         const button = document.createElement("button");
         button.setAttribute('class', 'button --start');
         button.innerText = "START";
-        body === null || body === void 0 ? void 0 : body.appendChild(menuContainer);
-        menuContainer.appendChild(menu);
+        this.menuContainer.appendChild(menu);
         menu.appendChild(title);
         menu.appendChild(button);
         button.addEventListener('click', () => {
             menu.remove();
             this.start();
         });
-        const pauseButton = document.createElement("button");
-        pauseButton.innerText = "PAUSE";
-        pauseButton.setAttribute('class', 'button --pause');
-        menuContainer.appendChild(pauseButton);
-        pauseButton.addEventListener('click', () => {
-            this.isPaused = !this.isPaused;
-            if (this.isPaused) {
-                this.audioPlayer.pause();
-                this.timer.stopTimer();
-            }
-            else {
-                this.audioPlayer.play();
-                this.gameLoop();
-                this.timer.startTimer();
-            }
-        });
-        this.scoreboard = new Scoreboard();
-        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.scoreboard);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.fetchNotesForSong();
+            this.timer = new Timer();
             this.timer.startTimer();
             this.audioPlayer.play();
+            this.scoreboard = new Scoreboard();
+            this.scoreboard.setScore(0);
+            this.pauseButton = document.createElement("button");
+            this.pauseButton.innerText = "PAUSE";
+            this.pauseButton.setAttribute('class', 'button --pause');
+            this.menuContainer.appendChild(this.pauseButton);
+            this.pauseButton.addEventListener('click', () => { this.pauseGame(); });
             this.notes.forEach(note => {
                 this.bullets.push(new Bullet(note.title, note.time));
             });
             this.gameLoop();
         });
+    }
+    pauseGame() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            this.audioPlayer.pause();
+            this.timer.stopTimer();
+            this.pauseMenu = new PauseMenu();
+        }
+        else {
+            this.audioPlayer.play();
+            this.gameLoop();
+            this.timer.startTimer();
+            this.pauseMenu.remove();
+        }
+    }
+    stopGame() {
+        console.log('hoi');
+        this.points = 0;
+        this.isPaused = false;
+        this.bullets.forEach(bullet => {
+            bullet.remove();
+        });
+        this.scoreboard.remove();
+        this.pauseButton.remove();
+        this.timer.remove();
+        this.bullets = [];
+        this.notes = [];
+        this.audioPlayer.stop();
+        this.createMenu();
     }
     fetchNotesForSong() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -178,31 +197,7 @@ class Main {
                 .then(json => { this.notes = json.notes; });
         });
     }
-    checkDelay() {
-        this.delay = (this.timer.sec + this.timer.ms / 100) - (this.audioPlayer.audio.currentTime % 60);
-        if (this.delay <= -0.4 || this.delay >= 0.4) {
-            this.timer.sec = Math.round(this.audioPlayer.audio.currentTime % 60);
-            this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0, 2);
-        }
-    }
-    fixCurrentPositions() {
-        for (const bullet of this.bullets) {
-            bullet._position.y = bullet.clientHeight + bullet.speed * (this.timer.sec - parseInt(bullet.time.sec));
-        }
-    }
-    spawnLateBullets() {
-        for (const note of this.notes) {
-            if ((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
-                if ((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
-                    const newBullet = new Bullet(note.title, note.time);
-                    this.bullets.push(newBullet);
-                    newBullet._position.y = newBullet.speed * this.delay * 100;
-                }
-            }
-        }
-    }
     gameLoop() {
-        this.checkDelay();
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
                 if (bullet !== otherBullet) {
@@ -262,6 +257,25 @@ class Main {
     }
 }
 window.addEventListener("load", () => Main.getInstance());
+class PauseMenu extends HTMLElement {
+    constructor() {
+        var _a;
+        super();
+        this.setAttribute('class', 'pause-menu');
+        this.main = Main.getInstance();
+        const resumeButton = document.createElement('button');
+        resumeButton.innerText = "RESUME";
+        resumeButton.addEventListener('click', () => { this.main.pauseGame(); this.remove(); });
+        this.appendChild(resumeButton);
+        const stopButton = document.createElement('button');
+        stopButton.setAttribute('class', 'stop');
+        stopButton.innerText = "STOP";
+        stopButton.addEventListener('click', () => { this.main.stopGame(); this.remove(); });
+        this.appendChild(stopButton);
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+    }
+}
+window.customElements.define("pausemenu-component", PauseMenu);
 class PitchDetect extends HTMLElement {
     constructor() {
         super();
@@ -424,11 +438,13 @@ class PitchDetect extends HTMLElement {
 window.customElements.define("pitchdetect-component", PitchDetect);
 class Scoreboard extends HTMLElement {
     constructor() {
+        var _a;
         super();
         this.score = 0;
         this.scoreIncreases = false;
-        this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px;');
+        this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px; text-align: right;');
         this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`;
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
     }
     setScore(score) {
         this.scoreIncreases = score > this.score;
@@ -465,9 +481,9 @@ class Timer extends HTMLElement {
         this.sec = 0;
         this.ms = 0;
         this.stoptime = true;
-        this.timer = document.createElement('h2');
-        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this.timer);
-        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;');
+        this.innerHTML = '<h2></h2>';
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+        this.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;');
     }
     startTimer() {
         if (this.stoptime == true) {
@@ -504,11 +520,12 @@ class Timer extends HTMLElement {
             if (this.min < 10 || this.min == 0) {
                 this.min = '0' + this.min;
             }
-            this.timer.innerHTML = this.min + ':' + this.sec + ':' + this.ms;
+            this.innerHTML = '<h2>' + this.min + ':' + this.sec + ':' + this.ms + '</h2>';
             setTimeout(() => { this.timerCycle(); }, 10);
         }
     }
     resetTimer() {
+        this.innerHTML = '<h2>00:00:00</h2>';
         this.stoptime = true;
         this.min = 0;
         this.ms = 0;

@@ -5,13 +5,13 @@ class Timer extends HTMLElement {
     public sec: any = 0;
     public ms: any = 0;
     public stoptime: boolean = true;
-    private timer: HTMLElement;
+    // private timer: HTMLElement;
 
     constructor() {
         super()
-        this.timer = document.createElement('h2')
-        document.getElementById('menu-container')?.appendChild(this.timer)
-        this.timer.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;')
+        this.innerHTML = '<h2></h2>'
+        document.getElementById('menu-container')?.appendChild(this)
+        this.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;')
     }
 
     startTimer() {
@@ -54,19 +54,19 @@ class Timer extends HTMLElement {
         this.min = '0' + this.min;
         }
 
-        this.timer.innerHTML = this.min + ':' + this.sec + ':' + this.ms;
+        this.innerHTML = '<h2>' + this.min + ':' + this.sec + ':' + this.ms + '</h2>';
         // console.log( this.min + ':' + this.sec + ':' + this.ms);
         setTimeout(() => {this.timerCycle()}, 10);
     }
-    }
+}
 
-    public resetTimer() {
-        // this.timer.innerHTML = '00:00:00';
-        this.stoptime = true;
-        this.min = 0;
-        this.ms = 0;
-        this.sec = 0;
-    }
+public resetTimer() {
+    this.innerHTML = '<h2>00:00:00</h2>';
+    this.stoptime = true;
+    this.min = 0;
+    this.ms = 0;
+    this.sec = 0;
+}
 }
 
 

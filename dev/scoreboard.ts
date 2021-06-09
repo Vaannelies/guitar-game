@@ -5,8 +5,10 @@ class Scoreboard extends HTMLElement {
     constructor() {
         super()
         // this. = document.createElement('h1');
-        this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px;')
+        this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px; text-align: right;')
         this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`
+        // document.body.appendChild(this);
+        document.getElementById('menu-container')?.appendChild(this);
     }
     
     public setScore(score: number) {
