@@ -3,12 +3,12 @@
         "strict": true,
         "target": "es6",
         "removeComments": true,
-        "noUnusedLocals":true,
-        "noUnusedParameters":true,
         "sourceMap": true,
-        "module": "CommonJS",
+        "outFile": "docs/js/main.js",
+        "outDir": "docs/js",
+        "resolveJsonModule": true,
         "moduleResolution": "node",
-        // "outFile": "/docs/js/main.js",
+        "esModuleInterop": true,
     },
     "include": [
         "dev/**/*"

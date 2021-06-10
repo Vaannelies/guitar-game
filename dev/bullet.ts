@@ -1,42 +1,41 @@
 /// <reference path="gameobject.ts" />
 
 class Bullet extends GameObject {
-    // Fields
-    private captain         : Captain
+    public note: string
+    public time: {min: string, sec: string, ms: string}
+    private main: Main
+    public pointWasGiven: boolean
 
-    private numberOfHits    : number = 0
-    private _hit: boolean = false
-    
-    private previousHit     : boolean = false
-
-    // Properties
-    public set hit(value: boolean)  { this._hit = value     }
-
-    constructor() {
+    constructor(note: string,  time: {min: string, sec: string, ms: string}) {
         super()
+        this.time = time;
+        this.note = note;
+        this.pointWasGiven = false;
 
-        this.captain = new Captain(this)
+        this.main = Main.getInstance()
+
+        this._position =  new Vector(
+            (Math.random() * window.innerWidth   - this.clientWidth) + (this.clientWidth / 2), 
+            this.clientHeight - ((this.main.audioPlayer.audio.duration - (parseInt(this.time.sec) + (parseInt(this.time.min) * 60)) ) * this.speed) )
+        this.style.display = "flex";
+        this.style.justifyContent = "center";
+        this.style.alignItems = "center";
+        const banner = document.createElement('span')
+        banner.innerHTML = this.note;
+        this.appendChild(banner)
+        this.moveBullet();
     }
 
-    public update() {
-        this.checkCollision()
-
-        this.captain.update()
-
-        super.update()
+    public moveBullet() {
+        this._position.y =
+         (((this.main.audioPlayer.audio.currentTime) - ((parseInt(this.time.sec) + (parseInt(this.time.min) * 60) + (parseInt(this.time.ms)/100)) - 4)) * this.speed)
+        this.draw()
+        setTimeout(() => {this.moveBullet()}, 100)
     }
-
-    private checkCollision() {
-        if(this._hit && !this.previousHit) {
-            this.captain.onCollision(++this.numberOfHits)
-
-            let times = this.numberOfHits == 1 ? "time" : "times"
-            console.log(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
-            Messageboard.getInstance().addMessage(`${this.color} pirateship got hit ${this.numberOfHits} ${times}!`)
-        }
-
-        this.previousHit = this._hit
+    
+    public draw() {
+        this.style.transform = `translate(${this._position.x}px, ${this._position.y}px) rotate(${this.rotation}deg)`
     }
 }
 
-window.customElements.define("ship-component", Bullet)
+window.customElements.define("bullet-component", Bullet)

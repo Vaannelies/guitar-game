@@ -1,4 +1,4 @@
-class Vector{
+class Vector {
     // Fields
     private _x: number = 0
     private _y: number = 0
@@ -15,3 +15,5 @@ class Vector{
         this._y = y
     }
 }
+
+// window.customElements.define("vector-component", Vector)
