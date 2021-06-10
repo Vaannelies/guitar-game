@@ -22,7 +22,6 @@ class GameObject extends HTMLElement {
         let game = document.getElementsByTagName("game")[0]
         this.setAttribute('class', 'bullet')
         game.appendChild(this)
-        console.log("window innerwidth", window.innerWidth, "this.clientWidth", this.clientWidth)
         this._position  = new Vector(
                             Math.random() * window.innerWidth   - this.clientWidth, 
                             0)
