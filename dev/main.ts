@@ -1,3 +1,6 @@
+/// <reference path="timer.ts"/>
+/// <reference path="pitchdetect.ts"/>
+
 class Main {
     // const Stopwatch = requestAnimationFrame()
     public  audioPlayer: AudioPlayer
@@ -149,7 +152,7 @@ class Main {
                         } else {
                             if(!bullet.pointWasGiven) {
                                 bullet.style.backgroundColor = "#e2eaff";
-                                if(bullet._position.y >= (document.getElementById('ba').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
+                                if(bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
                                     if(this.pitchdetect.note !== null) {
                                         if(this.pitchdetect.outputNote === bullet.note) {
                                             bullet.style.backgroundColor = "#00ee00";
@@ -160,7 +163,6 @@ class Main {
                                             bullet.style.boxShadow = "0 0 30px 1px red";
                                             this.points--;
                                         }                                        
-                                        break
                                     } else { 
                                         bullet.style.backgroundColor = "#222222";
                                         bullet.style.boxShadow = "0 0 0 0";

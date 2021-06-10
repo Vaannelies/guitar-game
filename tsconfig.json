@@ -3,14 +3,17 @@
         "strict": true,
         "target": "es6",
         "removeComments": true,
-        "noUnusedLocals":true,
-        "noUnusedParameters":true,
+        // "noUnusedLocals":true,
+    
+        // "noUnusedParameters":true,
         "sourceMap": true,
         "outFile": "docs/js/main.js",
-        "outDir": "docs",
+        "module": "commonjs",
+        "outDir": "docs/js",
         "resolveJsonModule": true,
+        "moduleResolution": "node",
         "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true
+        // "allowSyntheticDefaultImports": true
 
     },
     "include": [

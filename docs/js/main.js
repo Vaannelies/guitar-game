@@ -104,167 +104,66 @@ class Bullet extends GameObject {
     }
 }
 window.customElements.define("bullet-component", Bullet);
-class Main {
-    constructor() {
-        var _a;
-        this.bullets = [];
-        this.isPaused = false;
-        this.menuContainer = document.createElement("div");
-        this.menuContainer.setAttribute('id', 'menu-container');
-        (_a = document.body) === null || _a === void 0 ? void 0 : _a.appendChild(this.menuContainer);
-        this.createMenu();
-        this.pitchdetect = new PitchDetect();
-        this.audioPlayer = new AudioPlayer();
-        this.points = 0;
-        this.bar = new Bar();
-    }
-    static getInstance() {
-        if (!Main.instance) {
-            Main.instance = new Main();
-        }
-        return this.instance;
-    }
-    createMenu() {
-        const menu = document.createElement("div");
-        menu.setAttribute('id', 'menu');
-        const title = document.createElement("h1");
-        title.setAttribute('class', 'title');
-        title.innerText = 'Are you ready?';
-        const button = document.createElement("button");
-        button.setAttribute('class', 'button --start');
-        button.innerText = "START";
-        this.menuContainer.appendChild(menu);
-        menu.appendChild(title);
-        menu.appendChild(button);
-        button.addEventListener('click', () => {
-            menu.remove();
-            this.start();
-        });
-    }
-    start() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.fetchNotesForSong();
-            this.timer = new Timer();
-            this.timer.startTimer();
-            this.audioPlayer.play();
-            this.scoreboard = new Scoreboard();
-            this.scoreboard.setScore(0);
-            this.pauseButton = document.createElement("button");
-            this.pauseButton.innerText = "PAUSE";
-            this.pauseButton.setAttribute('class', 'button --pause');
-            this.menuContainer.appendChild(this.pauseButton);
-            this.pauseButton.addEventListener('click', () => { this.pauseGame(); });
-            this.notes.forEach(note => {
-                this.bullets.push(new Bullet(note.title, note.time));
-            });
-            this.gameLoop();
-        });
-    }
-    pauseGame() {
-        this.isPaused = !this.isPaused;
-        if (this.isPaused) {
-            this.audioPlayer.pause();
-            this.timer.stopTimer();
-            this.pauseMenu = new PauseMenu();
-        }
-        else {
-            this.audioPlayer.play();
-            this.gameLoop();
-            this.timer.startTimer();
-            this.pauseMenu.remove();
-        }
-    }
-    stopGame() {
-        console.log('hoi');
-        this.points = 0;
-        this.isPaused = false;
-        this.bullets.forEach(bullet => {
-            bullet.remove();
-        });
-        this.scoreboard.remove();
-        this.pauseButton.remove();
-        this.timer.remove();
-        this.bullets = [];
-        this.notes = [];
-        this.audioPlayer.stop();
-        this.createMenu();
-    }
-    fetchNotesForSong() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield fetch("notes/perfect.json")
-                .then(response => response.json())
-                .then(json => { this.notes = json.notes; });
-        });
-    }
-    gameLoop() {
-        for (const bullet of this.bullets) {
-            for (const otherBullet of this.bullets) {
-                if (bullet !== otherBullet) {
-                    if (bullet.hasCollision(this.bar)) {
-                        if (!this.pitchdetect.active) {
-                            this.pitchdetect.activate();
-                        }
-                        else {
-                            if (!bullet.pointWasGiven) {
-                                bullet.style.backgroundColor = "#e2eaff";
-                                if (bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
-                                    if (this.pitchdetect.note !== null) {
-                                        if (this.pitchdetect.outputNote === bullet.note) {
-                                            bullet.style.backgroundColor = "#00ee00";
-                                            bullet.style.boxShadow = "0 0 30px 1px #00ee00";
-                                            this.points++;
-                                        }
-                                        else {
-                                            bullet.style.backgroundColor = "red";
-                                            bullet.style.boxShadow = "0 0 30px 1px red";
-                                            this.points--;
-                                        }
-                                        break;
-                                    }
-                                    else {
-                                        bullet.style.backgroundColor = "#222222";
-                                        bullet.style.boxShadow = "0 0 0 0";
-                                        this.points -= 1;
-                                    }
-                                    this.scoreboard.setScore(this.points);
-                                    bullet.pointWasGiven = true;
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        bullet.style.boxShadow = "0 0 30px 1px #3c00ff";
-                        bullet.style.backgroundColor = "white";
-                        this.pitchdetect.active = false;
-                    }
-                }
-            }
-        }
-        if (!this.isPaused) {
-            requestAnimationFrame(() => this.gameLoop());
-        }
-    }
-}
-window.addEventListener("load", () => Main.getInstance());
-class PauseMenu extends HTMLElement {
+class Timer extends HTMLElement {
     constructor() {
         var _a;
         super();
-        this.setAttribute('class', 'pause-menu');
-        this.main = Main.getInstance();
-        const resumeButton = document.createElement('button');
-        resumeButton.innerText = "RESUME";
-        resumeButton.addEventListener('click', () => { this.main.pauseGame(); this.remove(); });
-        this.appendChild(resumeButton);
-        const stopButton = document.createElement('button');
-        stopButton.setAttribute('class', 'stop');
-        stopButton.innerText = "STOP";
-        stopButton.addEventListener('click', () => { this.main.stopGame(); this.remove(); });
-        this.appendChild(stopButton);
+        this.min = 0;
+        this.sec = 0;
+        this.ms = 0;
+        this.stoptime = true;
+        this.innerHTML = '<h2></h2>';
         (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+        this.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;');
+    }
+    startTimer() {
+        if (this.stoptime == true) {
+            this.stoptime = false;
+            this.timerCycle();
+        }
+    }
+    stopTimer() {
+        if (this.stoptime == false) {
+            this.stoptime = true;
+        }
+    }
+    timerCycle() {
+        if (this.stoptime == false) {
+            this.ms = parseInt(this.ms);
+            this.sec = parseInt(this.sec);
+            this.min = parseInt(this.min);
+            this.ms = this.ms + 1;
+            if (this.ms == 60) {
+                this.sec = this.sec + 1;
+                this.ms = 0;
+            }
+            if (this.sec == 60 && this.ms == 0) {
+                this.min = this.min + 1;
+                this.sec = 0;
+                this.ms = 0;
+            }
+            if (this.ms < 10 || this.ms == 0) {
+                this.ms = '0' + this.ms;
+            }
+            if (this.sec < 10 || this.sec == 0) {
+                this.sec = '0' + this.sec;
+            }
+            if (this.min < 10 || this.min == 0) {
+                this.min = '0' + this.min;
+            }
+            this.innerHTML = '<h2>' + this.min + ':' + this.sec + ':' + this.ms + '</h2>';
+            setTimeout(() => { this.timerCycle(); }, 10);
+        }
+    }
+    resetTimer() {
+        this.innerHTML = '<h2>00:00:00</h2>';
+        this.stoptime = true;
+        this.min = 0;
+        this.ms = 0;
+        this.sec = 0;
     }
 }
-window.customElements.define("pausemenu-component", PauseMenu);
+window.customElements.define("timer-component", Timer);
 class PitchDetect extends HTMLElement {
     constructor() {
         super();
@@ -437,6 +336,166 @@ class PitchDetect extends HTMLElement {
     }
 }
 window.customElements.define("pitchdetect-component", PitchDetect);
+class Main {
+    constructor() {
+        var _a;
+        this.bullets = [];
+        this.isPaused = false;
+        this.menuContainer = document.createElement("div");
+        this.menuContainer.setAttribute('id', 'menu-container');
+        (_a = document.body) === null || _a === void 0 ? void 0 : _a.appendChild(this.menuContainer);
+        this.createMenu();
+        this.pitchdetect = new PitchDetect();
+        this.audioPlayer = new AudioPlayer();
+        this.points = 0;
+        this.bar = new Bar();
+    }
+    static getInstance() {
+        if (!Main.instance) {
+            Main.instance = new Main();
+        }
+        return this.instance;
+    }
+    createMenu() {
+        const menu = document.createElement("div");
+        menu.setAttribute('id', 'menu');
+        const title = document.createElement("h1");
+        title.setAttribute('class', 'title');
+        title.innerText = 'Are you ready?';
+        const button = document.createElement("button");
+        button.setAttribute('class', 'button --start');
+        button.innerText = "START";
+        this.menuContainer.appendChild(menu);
+        menu.appendChild(title);
+        menu.appendChild(button);
+        button.addEventListener('click', () => {
+            menu.remove();
+            this.start();
+        });
+    }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.fetchNotesForSong();
+            this.timer = new Timer();
+            this.timer.startTimer();
+            this.audioPlayer.play();
+            this.scoreboard = new Scoreboard();
+            this.scoreboard.setScore(0);
+            this.pauseButton = document.createElement("button");
+            this.pauseButton.innerText = "PAUSE";
+            this.pauseButton.setAttribute('class', 'button --pause');
+            this.menuContainer.appendChild(this.pauseButton);
+            this.pauseButton.addEventListener('click', () => { this.pauseGame(); });
+            this.notes.forEach(note => {
+                this.bullets.push(new Bullet(note.title, note.time));
+            });
+            this.gameLoop();
+        });
+    }
+    pauseGame() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            this.audioPlayer.pause();
+            this.timer.stopTimer();
+            this.pauseMenu = new PauseMenu();
+        }
+        else {
+            this.audioPlayer.play();
+            this.gameLoop();
+            this.timer.startTimer();
+            this.pauseMenu.remove();
+        }
+    }
+    stopGame() {
+        console.log('hoi');
+        this.points = 0;
+        this.isPaused = false;
+        this.bullets.forEach(bullet => {
+            bullet.remove();
+        });
+        this.scoreboard.remove();
+        this.pauseButton.remove();
+        this.timer.remove();
+        this.bullets = [];
+        this.notes = [];
+        this.audioPlayer.stop();
+        this.createMenu();
+    }
+    fetchNotesForSong() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield fetch("notes/perfect.json")
+                .then(response => response.json())
+                .then(json => { this.notes = json.notes; });
+        });
+    }
+    gameLoop() {
+        for (const bullet of this.bullets) {
+            for (const otherBullet of this.bullets) {
+                if (bullet !== otherBullet) {
+                    if (bullet.hasCollision(this.bar)) {
+                        if (!this.pitchdetect.active) {
+                            this.pitchdetect.activate();
+                        }
+                        else {
+                            if (!bullet.pointWasGiven) {
+                                bullet.style.backgroundColor = "#e2eaff";
+                                if (bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
+                                    if (this.pitchdetect.note !== null) {
+                                        if (this.pitchdetect.outputNote === bullet.note) {
+                                            bullet.style.backgroundColor = "#00ee00";
+                                            bullet.style.boxShadow = "0 0 30px 1px #00ee00";
+                                            this.points++;
+                                        }
+                                        else {
+                                            bullet.style.backgroundColor = "red";
+                                            bullet.style.boxShadow = "0 0 30px 1px red";
+                                            this.points--;
+                                        }
+                                    }
+                                    else {
+                                        bullet.style.backgroundColor = "#222222";
+                                        bullet.style.boxShadow = "0 0 0 0";
+                                        this.points -= 1;
+                                    }
+                                    this.scoreboard.setScore(this.points);
+                                    bullet.pointWasGiven = true;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        bullet.style.boxShadow = "0 0 30px 1px #3c00ff";
+                        bullet.style.backgroundColor = "white";
+                        this.pitchdetect.active = false;
+                    }
+                }
+            }
+        }
+        if (!this.isPaused) {
+            requestAnimationFrame(() => this.gameLoop());
+        }
+    }
+}
+window.addEventListener("load", () => Main.getInstance());
+class PauseMenu extends HTMLElement {
+    constructor() {
+        var _a;
+        super();
+        this.setAttribute('class', 'pause-menu');
+        this.main = Main.getInstance();
+        const resumeButton = document.createElement('button');
+        resumeButton.innerText = "RESUME";
+        resumeButton.addEventListener('click', () => { this.main.pauseGame(); this.remove(); });
+        this.appendChild(resumeButton);
+        const stopButton = document.createElement('button');
+        stopButton.setAttribute('class', 'stop');
+        stopButton.innerText = "STOP";
+        stopButton.addEventListener('click', () => { this.main.stopGame(); this.remove(); });
+        this.appendChild(stopButton);
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+    }
+}
+window.customElements.define("pausemenu-component", PauseMenu);
 class Scoreboard extends HTMLElement {
     constructor() {
         var _a;
@@ -474,66 +533,6 @@ class Scoreboard extends HTMLElement {
     }
 }
 window.customElements.define("scoreboard-component", Scoreboard);
-class Timer extends HTMLElement {
-    constructor() {
-        var _a;
-        super();
-        this.min = 0;
-        this.sec = 0;
-        this.ms = 0;
-        this.stoptime = true;
-        this.innerHTML = '<h2></h2>';
-        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
-        this.setAttribute('style', 'z-index: 1; color: white; position: absolute; top: 0; left: 25px;');
-    }
-    startTimer() {
-        if (this.stoptime == true) {
-            this.stoptime = false;
-            this.timerCycle();
-        }
-    }
-    stopTimer() {
-        if (this.stoptime == false) {
-            this.stoptime = true;
-        }
-    }
-    timerCycle() {
-        if (this.stoptime == false) {
-            this.ms = parseInt(this.ms);
-            this.sec = parseInt(this.sec);
-            this.min = parseInt(this.min);
-            this.ms = this.ms + 1;
-            if (this.ms == 60) {
-                this.sec = this.sec + 1;
-                this.ms = 0;
-            }
-            if (this.sec == 60 && this.ms == 0) {
-                this.min = this.min + 1;
-                this.sec = 0;
-                this.ms = 0;
-            }
-            if (this.ms < 10 || this.ms == 0) {
-                this.ms = '0' + this.ms;
-            }
-            if (this.sec < 10 || this.sec == 0) {
-                this.sec = '0' + this.sec;
-            }
-            if (this.min < 10 || this.min == 0) {
-                this.min = '0' + this.min;
-            }
-            this.innerHTML = '<h2>' + this.min + ':' + this.sec + ':' + this.ms + '</h2>';
-            setTimeout(() => { this.timerCycle(); }, 10);
-        }
-    }
-    resetTimer() {
-        this.innerHTML = '<h2>00:00:00</h2>';
-        this.stoptime = true;
-        this.min = 0;
-        this.ms = 0;
-        this.sec = 0;
-    }
-}
-window.customElements.define("timer-component", Timer);
 class Vector {
     constructor(x, y) {
         this._x = 0;
