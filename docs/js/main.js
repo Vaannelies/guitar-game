@@ -198,10 +198,10 @@ class PitchDetect extends HTMLElement {
     getUserMedia(dictionary) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                navigator.getUserMedia =
-                    navigator.getUserMedia;
-                (navigator === null || navigator === void 0 ? void 0 : navigator.webkitGetUserMedia) ||
-                    (navigator === null || navigator === void 0 ? void 0 : navigator.mozGetUserMedia);
+                navigator.mediaDevices.getUserMedia =
+                    (navigator === null || navigator === void 0 ? void 0 : navigator.mediaDevices.getUserMedia) ||
+                        (navigator === null || navigator === void 0 ? void 0 : navigator.mediaDevices.webkitGetUserMedia) ||
+                        (navigator === null || navigator === void 0 ? void 0 : navigator.mediaDevices.mozGetUserMedia);
                 yield navigator.mediaDevices.getUserMedia(dictionary)
                     .then((res) => {
                     console.log(res);

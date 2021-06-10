@@ -119,10 +119,10 @@ class PitchDetect extends  HTMLElement {
 
     public async getUserMedia(dictionary: any) {
         try {
-            navigator.getUserMedia = 
-                navigator.getUserMedia;
-                navigator?.webkitGetUserMedia ||
-                navigator?.mozGetUserMedia;
+            navigator.mediaDevices.getUserMedia = 
+                navigator?.mediaDevices.getUserMedia ||
+                navigator?.mediaDevices.webkitGetUserMedia ||
+                navigator?.mediaDevices.mozGetUserMedia;
          
           await navigator.mediaDevices.getUserMedia(dictionary)
           .then((res) => { 
