@@ -51,7 +51,6 @@ class GameObject extends HTMLElement {
         let game = document.getElementsByTagName("game")[0];
         this.setAttribute('class', 'bullet');
         game.appendChild(this);
-        console.log("window innerwidth", window.innerWidth, "this.clientWidth", this.clientWidth);
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, 0);
         GameObject.numberOfBullets++;
         if (GameObject.numberOfBullets > 6)
@@ -85,7 +84,7 @@ class Bullet extends GameObject {
         this.note = note;
         this.pointWasGiven = false;
         this.main = Main.getInstance();
-        this._position = new Vector((Math.random() * window.innerWidth - this.clientWidth) + this.clientWidth, this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec)) * this.speed));
+        this._position = new Vector((Math.random() * window.innerWidth - this.clientWidth) + (this.clientWidth / 2), this.clientHeight - ((this.main.audioPlayer.audio.duration - (parseInt(this.time.sec) + (parseInt(this.time.min) * 60))) * this.speed));
         this.style.display = "flex";
         this.style.justifyContent = "center";
         this.style.alignItems = "center";
@@ -96,7 +95,7 @@ class Bullet extends GameObject {
     }
     moveBullet() {
         this._position.y =
-            (((this.main.audioPlayer.audio.currentTime % 60) - ((parseInt(this.time.sec) + (parseInt(this.time.ms) / 100)) - 4)) * this.speed);
+            (((this.main.audioPlayer.audio.currentTime) - ((parseInt(this.time.sec) + (parseInt(this.time.min) * 60) + (parseInt(this.time.ms) / 100)) - 4)) * this.speed);
         this.draw();
         setTimeout(() => { this.moveBullet(); }, 100);
     }
@@ -208,37 +207,27 @@ class Main {
                         else {
                             if (!bullet.pointWasGiven) {
                                 bullet.style.backgroundColor = "#e2eaff";
-                            }
-                            if (this.pitchdetect.note !== null) {
-                                if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] === bullet.note) {
-                                    if (!bullet.pointWasGiven) {
-                                        bullet.style.backgroundColor = "#00ee00";
-                                        bullet.style.boxShadow = "0 0 30px 1px #00ee00";
-                                        this.points++;
-                                        this.scoreboard.setScore(this.points);
-                                        bullet.pointWasGiven = true;
-                                    }
-                                }
-                                else if (this.pitchdetect.noteStrings[this.pitchdetect.note % 12] !== bullet.note) {
-                                    if (!bullet.pointWasGiven) {
-                                        bullet.style.backgroundColor = "red";
-                                        bullet.style.boxShadow = "0 0 30px 1px red";
-                                        this.points--;
-                                        this.scoreboard.setScore(this.points);
-                                        bullet.pointWasGiven = true;
-                                    }
-                                }
-                                break;
-                            }
-                            else {
                                 if (bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
-                                    if (!bullet.pointWasGiven) {
+                                    if (this.pitchdetect.note !== null) {
+                                        if (this.pitchdetect.outputNote === bullet.note) {
+                                            bullet.style.backgroundColor = "#00ee00";
+                                            bullet.style.boxShadow = "0 0 30px 1px #00ee00";
+                                            this.points++;
+                                        }
+                                        else {
+                                            bullet.style.backgroundColor = "red";
+                                            bullet.style.boxShadow = "0 0 30px 1px red";
+                                            this.points--;
+                                        }
+                                        break;
+                                    }
+                                    else {
                                         bullet.style.backgroundColor = "#222222";
                                         bullet.style.boxShadow = "0 0 0 0";
                                         this.points -= 1;
-                                        this.scoreboard.setScore(this.points);
-                                        bullet.pointWasGiven = true;
                                     }
+                                    this.scoreboard.setScore(this.points);
+                                    bullet.pointWasGiven = true;
                                 }
                             }
                         }
@@ -355,6 +344,18 @@ class PitchDetect extends HTMLElement {
             });
         });
     }
+    noteToOutputNote(note, octave) {
+        const noteString = this.noteStrings[note % 12];
+        if (this.noteStrings[note % 12].indexOf("#") !== -1) {
+            return noteString + this.octave;
+        }
+        else {
+            return noteString.substring(0, 1) + this.octave + noteString.substring(1, 2);
+        }
+    }
+    octaveFromNote(note) {
+        return (note - note % 12) / 12 - 1;
+    }
     noteFromPitch(frequency) {
         var noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
         return Math.round(noteNum) + 69;
@@ -423,11 +424,11 @@ class PitchDetect extends HTMLElement {
             else {
                 this.pitch = ac;
                 this.note = this.noteFromPitch(this.pitch);
+                this.octave = this.octaveFromNote(this.note);
+                this.outputNote = this.noteToOutputNote(this.note, this.octave);
                 this.detune = this.centsOffFromPitch(this.pitch, this.note);
                 if (this.detune == 0) {
                     console.log('perfect!');
-                }
-                else {
                 }
             }
             this.activeTime++;

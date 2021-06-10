@@ -15,8 +15,8 @@ class Bullet extends GameObject {
         this.main = Main.getInstance()
 
         this._position =  new Vector(
-            (Math.random() * window.innerWidth   - this.clientWidth) + this.clientWidth, 
-            this.clientHeight - ((this.main.audioPlayer.audio.duration - parseInt(this.time.sec) ) * this.speed) )
+            (Math.random() * window.innerWidth   - this.clientWidth) + (this.clientWidth / 2), 
+            this.clientHeight - ((this.main.audioPlayer.audio.duration - (parseInt(this.time.sec) + (parseInt(this.time.min) * 60)) ) * this.speed) )
         this.style.display = "flex";
         this.style.justifyContent = "center";
         this.style.alignItems = "center";
@@ -28,7 +28,7 @@ class Bullet extends GameObject {
 
     public moveBullet() {
         this._position.y =
-         (((this.main.audioPlayer.audio.currentTime%60) - ((parseInt(this.time.sec) + (parseInt(this.time.ms)/100)) - 4)) * this.speed)
+         (((this.main.audioPlayer.audio.currentTime) - ((parseInt(this.time.sec) + (parseInt(this.time.min) * 60) + (parseInt(this.time.ms)/100)) - 4)) * this.speed)
         this.draw()
         setTimeout(() => {this.moveBullet()}, 100)
     }

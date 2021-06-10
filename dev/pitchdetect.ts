@@ -7,14 +7,16 @@ class PitchDetect extends  HTMLElement {
     public DEBUGCANVAS: any = null; 
     public mediaStreamSource: any = null;
     public detectorElem: any; 
-    public	canvasElem: any;
-    public	waveCanvas: any;
-    public	pitchElem: any;
-    public	noteElem: any;
-    public	detuneElem: any;
-    public	detuneAmount: any;
+    public canvasElem: any;
+    public waveCanvas: any;
+    public pitchElem: any;
+    public noteElem: any;
+    public detuneElem: any;
+    public detuneAmount: any;
     public pitch: any;
     public note: any;
+    public outputNote: any;
+    public octave: any;
     public detune: any;
 
     public active: boolean;
@@ -229,6 +231,17 @@ class PitchDetect extends  HTMLElement {
 
     public noteStrings: any = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
+    public noteToOutputNote(note: any, octave: any) {
+        const noteString = this.noteStrings[note%12]
+        if(this.noteStrings[note%12].indexOf("#") !== -1) {
+            return noteString + this.octave
+        } else {
+            return noteString.substring(0,1) + this.octave + noteString.substring(1, 2)
+        }
+    }
+    public octaveFromNote(note: any) {
+        return (note - note%12) / 12 - 1 
+    }
     public noteFromPitch( frequency : any) {
         var noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
         return Math.round( noteNum ) + 69;
@@ -391,27 +404,16 @@ class PitchDetect extends  HTMLElement {
         //     this.detuneAmount.innerText = "--";
         } else {
         //     this.detectorElem.className = "confident";
-            this.pitch = ac;
-        //     this.pitchElem.innerText = Math.round( pitch ) ;
-            this.note = this.noteFromPitch( this.pitch );
-        //     this.noteElem.innerHTML = this.noteStrings[note%12];
+        this.pitch = ac;
+
+        this.note = this.noteFromPitch( this.pitch );
+        this.octave = this.octaveFromNote(this.note)
+        this.outputNote = this.noteToOutputNote(this.note, this.octave)
             this.detune= this.centsOffFromPitch( this.pitch, this.note );
             if (this.detune == 0 ) {
                 console.log('perfect!')
-        //         this.detuneElem.className = "";
-        //         this.detuneAmount.innerHTML = "--";
-            } else {
-                // console.log('detune: ', this.detune)
             }
-        //  else {
-        //         if (detune < 0)
-        //             this.detuneElem.className = "flat";
-        //         else
-        //             this.detuneElem.className = "sharp";
-        //         this.detuneAmount.innerHTML = Math.abs( detune );
-        //     }
-            // console.log(this.pitch, 'hoi', this.noteStrings[this.note%12])
-        }
+         }
 
     
         this.activeTime++

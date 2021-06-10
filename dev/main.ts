@@ -149,37 +149,25 @@ class Main {
                         } else {
                             if(!bullet.pointWasGiven) {
                                 bullet.style.backgroundColor = "#e2eaff";
-                            }
-                            if(this.pitchdetect.note !== null) {
-                                if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] === bullet.note) {
-                                    if(!bullet.pointWasGiven) {
-                                        bullet.style.backgroundColor = "#00ee00";
-                                        bullet.style.boxShadow = "0 0 30px 1px #00ee00";
-                                        this.points++;
-                                        this.scoreboard.setScore(this.points)
-                                        bullet.pointWasGiven = true;
-                                    }
-                                }
-                                else if(this.pitchdetect.noteStrings[this.pitchdetect.note%12] !== bullet.note) {
-                                    if(!bullet.pointWasGiven) {
-                                        bullet.style.backgroundColor = "red";
-                                        bullet.style.boxShadow = "0 0 30px 1px red";
-                                        this.points--;
-                                        this.scoreboard.setScore(this.points)
-                                        bullet.pointWasGiven = true;
-                                    }
-                                }
-                                break
-                            } else { 
-                                // console.log(this.bar.clientHeight, bullet._position.y)
                                 if(bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
-                                    if(!bullet.pointWasGiven) {
+                                    if(this.pitchdetect.note !== null) {
+                                        if(this.pitchdetect.outputNote === bullet.note) {
+                                            bullet.style.backgroundColor = "#00ee00";
+                                            bullet.style.boxShadow = "0 0 30px 1px #00ee00";
+                                            this.points++;
+                                        } else {
+                                            bullet.style.backgroundColor = "red";
+                                            bullet.style.boxShadow = "0 0 30px 1px red";
+                                            this.points--;
+                                        }                                        
+                                        break
+                                    } else { 
                                         bullet.style.backgroundColor = "#222222";
                                         bullet.style.boxShadow = "0 0 0 0";
                                         this.points -= 1;
-                                        this.scoreboard.setScore(this.points)
-                                        bullet.pointWasGiven = true;
                                     }
+                                    this.scoreboard.setScore(this.points)
+                                    bullet.pointWasGiven = true;
                                 }
                             }
                         }
