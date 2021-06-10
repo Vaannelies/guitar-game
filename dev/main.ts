@@ -149,7 +149,7 @@ class Main {
                         } else {
                             if(!bullet.pointWasGiven) {
                                 bullet.style.backgroundColor = "#e2eaff";
-                                if(bullet._position.y >= (document.getElementById('bar').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
+                                if(bullet._position.y >= (document.getElementById('ba').getBoundingClientRect().top + (document.getElementById('bar').getBoundingClientRect().height / 4))) {
                                     if(this.pitchdetect.note !== null) {
                                         if(this.pitchdetect.outputNote === bullet.note) {
                                             bullet.style.backgroundColor = "#00ee00";

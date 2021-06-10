@@ -43,7 +43,7 @@ window.onload = function() {
 	audioContext = new AudioContext();
 	MAX_SIZE = Math.max(4,Math.floor(audioContext.sampleRate/5000));	// corresponds to a 5kHz signal
 	var request = new XMLHttpRequest();
-	request.open("GET", "./audio/vocal1.ogg", true);
+	// request.open("GET", "./audio/vocal1.ogg", true);
 	request.responseType = "arraybuffer";
 	request.onload = () => {
 	  audioContext.decodeAudioData( request.response, (buffer)=> { 

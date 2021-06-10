@@ -33,7 +33,7 @@ var PitchDetect = /** @class */ (function (_super) {
         _this.audioContext = new AudioContext();
         // let MAX_SIZE = Math.max(4,Math.floor(this.audioContext.sampleRate/5000));	// corresponds to a 5kHz signal
         var request = new XMLHttpRequest();
-        request.open("GET", "./audio/vocal1.ogg", true);
+        // request.open("GET", "./audio/vocal1.ogg", true);
         request.responseType = "arraybuffer";
         request.onload = function () {
             var _a;
