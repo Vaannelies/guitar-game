@@ -17,6 +17,7 @@ class Main {
     private pauseButton: HTMLElement
     private pauseMenu: PauseMenu
     private menuContainer: HTMLElement
+    private songTitle: HTMLElement
 
 
    private constructor() {
@@ -27,6 +28,10 @@ class Main {
         this.pitchdetect = new PitchDetect();
         this.audioPlayer = new AudioPlayer();
         this.points = 0;
+        this.songTitle = document.createElement('h1')
+        this.songTitle.setAttribute('class', 'song-title');
+        this.songTitle.innerText = "Perfect - Ed Sheeran";
+        document.body.appendChild(this.songTitle)
         this.bar = new Bar();
     }
 
@@ -74,6 +79,10 @@ class Main {
         this.notes.forEach(note => {
             this.bullets.push(new Bullet(note.title, note.time))
         })
+        this.songTitle.style.opacity = "100%";
+        setTimeout(() => {
+            this.songTitle.style.opacity = "0%";
+        }, 2000);
         this.gameLoop()
     }
 
