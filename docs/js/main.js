@@ -435,6 +435,9 @@ class Main {
     createMenu() {
         const menu = document.createElement("div");
         menu.setAttribute('id', 'menu');
+        this.gameTitle = document.createElement("h1");
+        this.gameTitle.setAttribute('class', 'game-title');
+        this.gameTitle.innerText = 'Strings Attached';
         const title = document.createElement("h1");
         title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?';
@@ -447,6 +450,10 @@ class Main {
         const creditsButton = document.createElement("button");
         creditsButton.setAttribute('class', 'button --credits');
         creditsButton.innerText = "CREDITS";
+        this.menuContainer.appendChild(this.gameTitle);
+        setTimeout(() => {
+            this.gameTitle.style.opacity = "100%";
+        }, 200);
         this.menuContainer.appendChild(menu);
         menu.appendChild(title);
         menu.appendChild(button);
@@ -454,13 +461,16 @@ class Main {
         menu.appendChild(creditsButton);
         button.addEventListener('click', () => {
             menu.remove();
+            this.gameTitle.remove();
             this.start();
         });
         instructionsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showInstructions();
         });
         creditsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showCredits();
         });
@@ -468,6 +478,7 @@ class Main {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.fetchNotesForSong();
+            this.gameIsActive = true;
             this.timer = new Timer();
             this.timer.startTimer();
             this.audioPlayer.play();
@@ -499,6 +510,7 @@ class Main {
         this.credits = new Credits();
     }
     showFinish() {
+        this.timer.stopTimer();
         this.audioPlayer.fadeOut();
         this.finish = new Finish();
     }
@@ -543,7 +555,8 @@ class Main {
             for (const otherBullet of this.bullets) {
                 if (bullet !== otherBullet) {
                     if (bullet.hasCollision(this.bar)) {
-                        if (this.notes[this.notes.length - 1].time === bullet.time) {
+                        if (this.notes[this.notes.length - 1].time === bullet.time && bullet.pointWasGiven && this.gameIsActive) {
+                            this.gameIsActive = false;
                             setTimeout(() => {
                                 console.log(this.notes[this.notes.length - 1].time, bullet.time);
                                 this.showFinish();
