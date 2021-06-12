@@ -1,4 +1,4 @@
-class Instructions extends HTMLElement {
+class Credits extends HTMLElement {
     private main: Main;
 
     constructor() {
@@ -8,7 +8,7 @@ class Instructions extends HTMLElement {
 
         
         const text = document.createElement('div')
-        text.innerHTML= "<h2>HOW TO PLAY?</h2><p>Listen to the song and hit the right notes as they reach the bottom of the screen.<br><br>Grab your guitar and play along!</p>"
+        text.innerHTML= "<h2>CREDITS</h2><p>Song: <a href='https://www.youtube.com/watch?v=2Vv-BfVoq4g' target='_blank'>Perfect by Ed Sheeran</a><br><br>This game was created by Annelies Vaandrager</p>"
         this.appendChild(text)
 
 
@@ -27,4 +27,4 @@ class Instructions extends HTMLElement {
 }
 
 
-window.customElements.define("instructions-component", Instructions)
+window.customElements.define("credits-component", Credits)
