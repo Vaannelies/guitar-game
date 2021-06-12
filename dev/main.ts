@@ -17,6 +17,9 @@ class Main {
     private pauseButton: HTMLElement
     private pauseMenu: PauseMenu
     private menuContainer: HTMLElement
+    private songTitle: HTMLElement
+    private instructions: Instructions
+    private credits: Credits
 
 
    private constructor() {
@@ -27,6 +30,10 @@ class Main {
         this.pitchdetect = new PitchDetect();
         this.audioPlayer = new AudioPlayer();
         this.points = 0;
+        this.songTitle = document.createElement('div')
+        this.songTitle.setAttribute('class', 'song-title');
+        this.songTitle.innerHTML = "<h1 class='song-title --title'>Perfect</h1><p class='song-title --artist'>Ed Sheeran</p>";
+        document.body.appendChild(this.songTitle)
         this.bar = new Bar();
     }
 
@@ -43,16 +50,35 @@ class Main {
         const title = document.createElement("h1");
         title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?'
+
         const button = document.createElement("button");
         button.setAttribute('class', 'button --start')
         button.innerText = "START";
 
+        const instructionsButton = document.createElement("button");
+        instructionsButton.setAttribute('class', 'button --instructions')
+        instructionsButton.innerText = "HOW TO PLAY?";
+
+        const creditsButton = document.createElement("button");
+        creditsButton.setAttribute('class', 'button --credits')
+        creditsButton.innerText = "CREDITS";
+
         this.menuContainer.appendChild(menu)
         menu.appendChild(title)
         menu.appendChild(button)
+        menu.appendChild(instructionsButton)
+        menu.appendChild(creditsButton)
         button.addEventListener('click', () => {
             menu.remove();
             this.start();
+        })
+        instructionsButton.addEventListener('click', () => {
+            menu.remove();
+            this.showInstructions();
+        })
+        creditsButton.addEventListener('click', () => {
+            menu.remove();
+            this.showCredits();
         })
         
     }
@@ -74,7 +100,22 @@ class Main {
         this.notes.forEach(note => {
             this.bullets.push(new Bullet(note.title, note.time))
         })
+        this.songTitle.style.opacity = "100%";
+        (this.songTitle.children[0]  as HTMLElement).style.opacity= "100%";
+        (this.songTitle.children[1]  as HTMLElement).style.opacity= "100%";
+        setTimeout(() => {
+            this.songTitle.style.opacity = "0%";
+            (this.songTitle.children[0]  as HTMLElement).style.opacity = "0%";
+            (this.songTitle.children[1]  as HTMLElement).style.opacity = "0%";
+        }, 2000);
         this.gameLoop()
+    }
+    showInstructions() {
+        this.instructions = new Instructions()
+    }
+
+    showCredits() {
+        this.credits = new Credits()
     }
 
     pauseGame() {

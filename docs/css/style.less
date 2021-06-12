@@ -81,9 +81,28 @@ message {
     background: black;
     border-radius: 8px;
     color: white;
+    &:hover {
+        filter: brightness(50%);
+    }
+
     &.--start {
+        width: 100%;
         padding: 20px;
         font-size: 24px;
+        height: 2em;
+        background-color: rgb(0, 61, 0);
+        line-height: 0;
+    }
+    &.--instructions {
+        padding: 20px;
+        font-size: 20px;
+        height: 2em;
+        line-height: 0;
+    }
+    &.--credits {
+        width: 100%;
+        padding: 20px;
+        font-size: 20px;
         height: 2em;
         line-height: 0;
     }
@@ -101,11 +120,26 @@ message {
     padding: 25px;
     border-radius:8px; 
     background-color: white; 
+    align-items: center;
     height: fit-content; 
-    width: fit-content; 
+    width: 50%;
+    max-width: 430px;
     z-index: 1; 
     color: white;
 
+    h2 {
+        color: black;
+        width: 100%;
+        padding: 0 20px 0 20px;
+        margin-bottom: 0;
+    }
+    
+    p {
+        margin-top: 0;
+        color: black;
+        padding: 20px;
+    }
+    
     button {
         background: black;
         border-radius: 8px;
@@ -114,13 +148,66 @@ message {
         font-size: 24px;
         height: 2em;
         line-height: 0;
+        width: 220px;
+        
+        &:hover {
+            filter: brightness(50%);
+        }
     }
     
     .stop {
         background: rgb(109, 1, 1);
     }
+    @media (max-width: 480px){
+        width: 80%;
+    }
+    
+    @media (max-width: 400px){
+        button {
+            padding: 0;
+            width: 120px;
+        }
+        h2 {
+            font-size: 20px;
+        }
+
+    }
 }
 
 h2 {
     width: 30vw;
+}
+
+.song-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    font-size: 40px;
+    top: 50%;
+    left: 50%;
+    width: 40vw;
+    opacity: 0%;
+    transform: translate(-100%, -100%);
+    color: white;
+    transition: 1s;
+    &.--artist {
+        position: relative;
+        transform: translate(0,0);
+    }
+    &.--title {
+        margin-bottom: 0;
+        position: relative;  
+        font-size: 60px;
+        transform: translate(0,0);
+    }
+    @media (max-width: 800px){
+        
+        &.--artist {
+            font-size: 20px;   
+        }
+        &.--title {
+            font-size: 40px;   
+        }
+    }
 }
