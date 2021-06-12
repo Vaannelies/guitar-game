@@ -18,6 +18,7 @@ class Main {
     private pauseMenu: PauseMenu
     private menuContainer: HTMLElement
     private songTitle: HTMLElement
+    private instructions: Instructions
 
 
    private constructor() {
@@ -48,16 +49,26 @@ class Main {
         const title = document.createElement("h1");
         title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?'
+
         const button = document.createElement("button");
         button.setAttribute('class', 'button --start')
         button.innerText = "START";
 
+        const instructionsButton = document.createElement("button");
+        instructionsButton.setAttribute('class', 'button --instructions')
+        instructionsButton.innerText = "HOW TO PLAY?";
+
         this.menuContainer.appendChild(menu)
         menu.appendChild(title)
         menu.appendChild(button)
+        menu.appendChild(instructionsButton)
         button.addEventListener('click', () => {
             menu.remove();
             this.start();
+        })
+        instructionsButton.addEventListener('click', () => {
+            menu.remove();
+            this.showInstructions();
         })
         
     }
@@ -88,6 +99,9 @@ class Main {
             (this.songTitle.children[1]  as HTMLElement).style.opacity = "0%";
         }, 2000);
         this.gameLoop()
+    }
+    async showInstructions() {
+        this.instructions = new Instructions()
     }
 
     pauseGame() {

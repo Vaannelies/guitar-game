@@ -104,6 +104,24 @@ class Bullet extends GameObject {
     }
 }
 window.customElements.define("bullet-component", Bullet);
+class Instructions extends HTMLElement {
+    constructor() {
+        var _a;
+        super();
+        this.setAttribute('class', 'pause-menu');
+        this.main = Main.getInstance();
+        const text = document.createElement('div');
+        text.innerHTML = "<h2>HOW TO PLAY?</h2><p>Listen to the song and hit the right notes as they reach the bottom of the screen.<br><br>Get your guitar and play along!</p>";
+        this.appendChild(text);
+        const button = document.createElement('button');
+        button.setAttribute('class', 'back');
+        button.innerText = "BACK";
+        button.addEventListener('click', () => { this.main.createMenu(); this.remove(); });
+        this.appendChild(button);
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+    }
+}
+window.customElements.define("instructions-component", Instructions);
 class Timer extends HTMLElement {
     constructor() {
         var _a;
@@ -369,12 +387,20 @@ class Main {
         const button = document.createElement("button");
         button.setAttribute('class', 'button --start');
         button.innerText = "START";
+        const instructionsButton = document.createElement("button");
+        instructionsButton.setAttribute('class', 'button --instructions');
+        instructionsButton.innerText = "HOW TO PLAY?";
         this.menuContainer.appendChild(menu);
         menu.appendChild(title);
         menu.appendChild(button);
+        menu.appendChild(instructionsButton);
         button.addEventListener('click', () => {
             menu.remove();
             this.start();
+        });
+        instructionsButton.addEventListener('click', () => {
+            menu.remove();
+            this.showInstructions();
         });
     }
     start() {
@@ -402,6 +428,11 @@ class Main {
                 this.songTitle.children[1].style.opacity = "0%";
             }, 2000);
             this.gameLoop();
+        });
+    }
+    showInstructions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.instructions = new Instructions();
         });
     }
     pauseGame() {
