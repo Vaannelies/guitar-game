@@ -23,6 +23,7 @@ class Main {
     private finish: Finish
     private gameIsActive: boolean;
     private gameTitle: HTMLElement
+    private scoreIsIncreasing: boolean;
 
 
    private constructor() {
@@ -99,6 +100,7 @@ class Main {
     }
     
     async start() {
+        this.scoreIsIncreasing = false
         await this.fetchNotesForSong();
         this.gameIsActive = true;
         this.timer = new Timer();
@@ -198,16 +200,25 @@ class Main {
                                         if(this.pitchdetect.outputNote === bullet.note) {
                                             bullet.style.backgroundColor = "#00ee00";
                                             bullet.style.boxShadow = "0 0 30px 1px #00ee00";
-                                            this.points++;
+                                            if(this.scoreIsIncreasing) {
+                                                this.points += 250;
+                                            } else {
+                                                this.points += 150;
+                                            }
                                         } else {
                                             bullet.style.backgroundColor = "red";
                                             bullet.style.boxShadow = "0 0 30px 1px red";
-                                            this.points--;
+                                            this.points -= 100;
                                         }                                        
                                     } else { 
                                         bullet.style.backgroundColor = "#222222";
                                         bullet.style.boxShadow = "0 0 0 0";
-                                        this.points -= 1;
+                                        this.points -= 150;
+                                    }
+                                    if(this.points > this.scoreboard.getScore()) {
+                                        this.scoreIsIncreasing = true
+                                    } else {
+                                        this.scoreIsIncreasing = false
                                     }
                                     this.scoreboard.setScore(this.points)
                                     bullet.pointWasGiven = true;

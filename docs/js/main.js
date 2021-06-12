@@ -477,6 +477,7 @@ class Main {
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.scoreIsIncreasing = false;
             yield this.fetchNotesForSong();
             this.gameIsActive = true;
             this.timer = new Timer();
@@ -573,18 +574,29 @@ class Main {
                                         if (this.pitchdetect.outputNote === bullet.note) {
                                             bullet.style.backgroundColor = "#00ee00";
                                             bullet.style.boxShadow = "0 0 30px 1px #00ee00";
-                                            this.points++;
+                                            if (this.scoreIsIncreasing) {
+                                                this.points += 250;
+                                            }
+                                            else {
+                                                this.points += 150;
+                                            }
                                         }
                                         else {
                                             bullet.style.backgroundColor = "red";
                                             bullet.style.boxShadow = "0 0 30px 1px red";
-                                            this.points--;
+                                            this.points -= 100;
                                         }
                                     }
                                     else {
                                         bullet.style.backgroundColor = "#222222";
                                         bullet.style.boxShadow = "0 0 0 0";
-                                        this.points -= 1;
+                                        this.points -= 150;
+                                    }
+                                    if (this.points > this.scoreboard.getScore()) {
+                                        this.scoreIsIncreasing = true;
+                                    }
+                                    else {
+                                        this.scoreIsIncreasing = false;
                                     }
                                     this.scoreboard.setScore(this.points);
                                     bullet.pointWasGiven = true;
@@ -630,6 +642,7 @@ class Scoreboard extends HTMLElement {
         var _a;
         super();
         this.score = 0;
+        this.oldScore = 0;
         this.scoreIncreases = false;
         this.setAttribute('style', 'height: fit-content; width: fit-content; z-index: 1; color: white; position: absolute; top: 0; right: 25px; text-align: right;');
         this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`;
@@ -637,6 +650,7 @@ class Scoreboard extends HTMLElement {
     }
     setScore(score) {
         this.scoreIncreases = score > this.score;
+        this.oldScore = this.score;
         this.score = score;
         this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`;
         this.changeColor(this.scoreIncreases);
@@ -650,9 +664,10 @@ class Scoreboard extends HTMLElement {
     changeColor(positive) {
         if (positive) {
             this.style.color = "green";
-            if (((this.score).toString().length > 1) &&
+            if ((((this.score).toString()).length > 3) &&
                 ((this.score) > 0) &&
-                (parseInt((this.score).toString().slice(-1)) === 0)) {
+                ((parseInt((this.score).toString()[((this.score).toString()).length - 4]) > parseInt((this.oldScore).toString()[((this.oldScore).toString()).length - 4]))
+                    || (((this.score).toString()).length === 4 && ((this.oldScore).toString()).length === 3))) {
                 this.style.color = "yellow";
             }
         }

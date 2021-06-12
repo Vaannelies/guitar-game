@@ -1,5 +1,6 @@
 class Scoreboard extends HTMLElement {
     private score: number = 0;
+    private oldScore: number = 0;
     private scoreIncreases: boolean = false;
 
     constructor() {
@@ -13,7 +14,7 @@ class Scoreboard extends HTMLElement {
     
     public setScore(score: number) {
         this.scoreIncreases = score > this.score
-
+        this.oldScore = this.score
         this.score = score;
         this.innerHTML = `<h2>Score: ${this.score.toString()}</h2>`
 
@@ -31,10 +32,11 @@ class Scoreboard extends HTMLElement {
         if(positive) {
             this.style.color = "green"
             if(
-                ((this.score).toString().length > 1) && 
+                (((this.score).toString()).length > 3) && 
                 ((this.score) > 0) && 
-                (parseInt((this.score).toString().slice(-1)) === 0)
-            ) 
+                ((parseInt((this.score).toString()[((this.score).toString()).length - 4]) > parseInt((this.oldScore).toString()[((this.oldScore).toString()).length - 4]) )
+                || (((this.score).toString()).length === 4 && ((this.oldScore).toString()).length === 3 )
+            ))
                 {
                     this.style.color = "yellow"
                 }
