@@ -12,6 +12,8 @@ class AudioPlayer extends HTMLElement {
     constructor() {
         super();
         this.audio = new Audio('./audio/perfect.mp3');
+        this.audio.setAttribute('id', 'audio');
+        console.log(this.audio);
     }
     play() {
         const startPlayPromise = this.audio.play();
@@ -33,6 +35,23 @@ class AudioPlayer extends HTMLElement {
     stop() {
         this.audio.pause();
         this.audio.currentTime = 0;
+    }
+    fadeOut() {
+        setTimeout(() => {
+            this.audio.volume = 0.8;
+            setTimeout(() => {
+                this.audio.volume = 0.6;
+                setTimeout(() => {
+                    this.audio.volume = 0.4;
+                    setTimeout(() => {
+                        this.audio.volume = 0.2;
+                        setTimeout(() => {
+                            this.audio.volume = 0.0;
+                        }, 300);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }, 300);
     }
 }
 window.customElements.define("audioplayer-component", AudioPlayer);
@@ -122,6 +141,23 @@ class Credits extends HTMLElement {
     }
 }
 window.customElements.define("credits-component", Credits);
+class Finish extends HTMLElement {
+    constructor() {
+        var _a;
+        super();
+        this.setAttribute('class', 'pause-menu');
+        this.main = Main.getInstance();
+        const text = document.createElement('div');
+        text.innerHTML = `<h2>Well done!</h2><p>Score: ${this.main.points}</p>`;
+        this.appendChild(text);
+        const stopButton = document.createElement('button');
+        stopButton.innerText = "OK";
+        stopButton.addEventListener('click', () => { this.main.stopGame(); this.remove(); });
+        this.appendChild(stopButton);
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+    }
+}
+window.customElements.define("finish-component", Finish);
 class Instructions extends HTMLElement {
     constructor() {
         var _a;
@@ -399,6 +435,9 @@ class Main {
     createMenu() {
         const menu = document.createElement("div");
         menu.setAttribute('id', 'menu');
+        this.gameTitle = document.createElement("h1");
+        this.gameTitle.setAttribute('class', 'game-title');
+        this.gameTitle.innerText = 'Strings Attached';
         const title = document.createElement("h1");
         title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?';
@@ -411,6 +450,10 @@ class Main {
         const creditsButton = document.createElement("button");
         creditsButton.setAttribute('class', 'button --credits');
         creditsButton.innerText = "CREDITS";
+        this.menuContainer.appendChild(this.gameTitle);
+        setTimeout(() => {
+            this.gameTitle.style.opacity = "100%";
+        }, 200);
         this.menuContainer.appendChild(menu);
         menu.appendChild(title);
         menu.appendChild(button);
@@ -418,13 +461,16 @@ class Main {
         menu.appendChild(creditsButton);
         button.addEventListener('click', () => {
             menu.remove();
+            this.gameTitle.remove();
             this.start();
         });
         instructionsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showInstructions();
         });
         creditsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showCredits();
         });
@@ -432,6 +478,7 @@ class Main {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.fetchNotesForSong();
+            this.gameIsActive = true;
             this.timer = new Timer();
             this.timer.startTimer();
             this.audioPlayer.play();
@@ -461,6 +508,11 @@ class Main {
     }
     showCredits() {
         this.credits = new Credits();
+    }
+    showFinish() {
+        this.timer.stopTimer();
+        this.audioPlayer.fadeOut();
+        this.finish = new Finish();
     }
     pauseGame() {
         this.isPaused = !this.isPaused;
@@ -503,6 +555,13 @@ class Main {
             for (const otherBullet of this.bullets) {
                 if (bullet !== otherBullet) {
                     if (bullet.hasCollision(this.bar)) {
+                        if (this.notes[this.notes.length - 1].time === bullet.time && bullet.pointWasGiven && this.gameIsActive) {
+                            this.gameIsActive = false;
+                            setTimeout(() => {
+                                console.log(this.notes[this.notes.length - 1].time, bullet.time);
+                                this.showFinish();
+                            }, 2000);
+                        }
                         if (!this.pitchdetect.active) {
                             this.pitchdetect.activate();
                         }

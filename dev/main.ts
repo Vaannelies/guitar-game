@@ -12,7 +12,7 @@ class Main {
     private pitchdetect: PitchDetect 
     private delay: number
     private static instance: Main
-    private points: number;
+    public points: number;
     private scoreboard: Scoreboard;
     private pauseButton: HTMLElement
     private pauseMenu: PauseMenu
@@ -20,6 +20,9 @@ class Main {
     private songTitle: HTMLElement
     private instructions: Instructions
     private credits: Credits
+    private finish: Finish
+    private gameIsActive: boolean;
+    private gameTitle: HTMLElement
 
 
    private constructor() {
@@ -47,6 +50,11 @@ class Main {
     createMenu() {
         const menu = document.createElement("div");
         menu.setAttribute('id', 'menu');
+        this.gameTitle = document.createElement("h1");
+        this.gameTitle.setAttribute('class', 'game-title');
+        this.gameTitle.innerText = 'Strings Attached'
+   
+        
         const title = document.createElement("h1");
         title.setAttribute('class', 'title');
         title.innerText = 'Are you ready?'
@@ -63,6 +71,10 @@ class Main {
         creditsButton.setAttribute('class', 'button --credits')
         creditsButton.innerText = "CREDITS";
 
+        this.menuContainer.appendChild(this.gameTitle)
+        setTimeout(() => {
+            this.gameTitle.style.opacity = "100%"
+        }, 200);
         this.menuContainer.appendChild(menu)
         menu.appendChild(title)
         menu.appendChild(button)
@@ -70,13 +82,16 @@ class Main {
         menu.appendChild(creditsButton)
         button.addEventListener('click', () => {
             menu.remove();
+            this.gameTitle.remove();
             this.start();
         })
         instructionsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showInstructions();
         })
         creditsButton.addEventListener('click', () => {
+            this.gameTitle.remove();
             menu.remove();
             this.showCredits();
         })
@@ -85,6 +100,7 @@ class Main {
     
     async start() {
         await this.fetchNotesForSong();
+        this.gameIsActive = true;
         this.timer = new Timer();
         this.timer.startTimer();
         this.audioPlayer.play();
@@ -116,6 +132,12 @@ class Main {
 
     showCredits() {
         this.credits = new Credits()
+    }
+    
+    showFinish() {
+        this.timer.stopTimer();
+        this.audioPlayer.fadeOut()
+        this.finish = new Finish()
     }
 
     pauseGame() {
@@ -154,40 +176,18 @@ class Main {
             .then(json => {this.notes = json.notes });
     }
 
-    // checkDelay() {
-    //     this.delay = (this.timer.sec + this.timer.ms/100) - (this.audioPlayer.audio.currentTime%60);
-    //     if(this.delay <= -0.4 || this.delay>= 0.4) {
-    //         this.timer.sec = Math.round(this.audioPlayer.audio.currentTime%60);
-    //         this.timer.ms = this.audioPlayer.audio.currentTime.toString().split(".")[1].substring(0,2);
-    //     }
-    // }
-
-    // fixCurrentPositions() {
-    //     for (const bullet of this.bullets) {
-    //         bullet._position.y = bullet.clientHeight + bullet.speed * (this.timer.sec - parseInt(bullet.time.sec))
-    //     }  
-    // }
-    
-    // spawnLateBullets() {
-
-    //     for (const note of this.notes) {
-    //         if((this.timer.sec - this.delay) > (parseInt(note.time.sec) - 4) && (this.timer.sec - this.delay) < (parseInt(note.time.sec))) {
-    //             if((this.bullets.filter(bullet => bullet.time === note.time)).length < 1) {
-    //                 const newBullet = new Bullet(note.title, note.time)
-    //                 this.bullets.push(newBullet)
-    //                 newBullet._position.y = newBullet.speed * this.delay * 100
-    //             }
-    //         }
-    //     }  
-    // }
-
     gameLoop() {
-        // console.log(this.points)
-        // this.checkDelay()
         for (const bullet of this.bullets) {
             for (const otherBullet of this.bullets) {
                 if(bullet !== otherBullet) {
                     if(bullet.hasCollision(this.bar)) {
+                        if(this.notes[this.notes.length-1].time === bullet.time && bullet.pointWasGiven && this.gameIsActive) {
+                            this.gameIsActive = false
+                            setTimeout(() => {
+                                console.log(this.notes[this.notes.length-1].time, bullet.time)
+                                this.showFinish()
+                            }, 2000);
+                        } 
                         if(!this.pitchdetect.active) {
                             this.pitchdetect.activate()
                         } else {
