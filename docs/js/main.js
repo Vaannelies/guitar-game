@@ -165,7 +165,7 @@ class Instructions extends HTMLElement {
         this.setAttribute('class', 'pause-menu');
         this.main = Main.getInstance();
         const text = document.createElement('div');
-        text.innerHTML = "<h2>HOW TO PLAY?</h2><p>Listen to the song and hit the right notes as they reach the bottom of the screen.<br><br>Grab your guitar and play along!</p>";
+        text.innerHTML = "<h2>HOW TO PLAY?</h2><p>Listen to the music and hit the right notes as they reach the bottom of the screen.<br><br>Grab your guitar and play along!</p>";
         this.appendChild(text);
         const button = document.createElement('button');
         button.setAttribute('class', 'back');
