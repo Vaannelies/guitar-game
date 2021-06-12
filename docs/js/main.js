@@ -12,6 +12,8 @@ class AudioPlayer extends HTMLElement {
     constructor() {
         super();
         this.audio = new Audio('./audio/perfect.mp3');
+        this.audio.setAttribute('id', 'audio');
+        console.log(this.audio);
     }
     play() {
         const startPlayPromise = this.audio.play();
@@ -33,6 +35,23 @@ class AudioPlayer extends HTMLElement {
     stop() {
         this.audio.pause();
         this.audio.currentTime = 0;
+    }
+    fadeOut() {
+        setTimeout(() => {
+            this.audio.volume = 0.8;
+            setTimeout(() => {
+                this.audio.volume = 0.6;
+                setTimeout(() => {
+                    this.audio.volume = 0.4;
+                    setTimeout(() => {
+                        this.audio.volume = 0.2;
+                        setTimeout(() => {
+                            this.audio.volume = 0.0;
+                        }, 300);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }, 300);
     }
 }
 window.customElements.define("audioplayer-component", AudioPlayer);
@@ -122,6 +141,23 @@ class Credits extends HTMLElement {
     }
 }
 window.customElements.define("credits-component", Credits);
+class Finish extends HTMLElement {
+    constructor() {
+        var _a;
+        super();
+        this.setAttribute('class', 'pause-menu');
+        this.main = Main.getInstance();
+        const text = document.createElement('div');
+        text.innerHTML = `<h2>Well done!</h2><p>Score: ${this.main.points}</p>`;
+        this.appendChild(text);
+        const stopButton = document.createElement('button');
+        stopButton.innerText = "OK";
+        stopButton.addEventListener('click', () => { this.main.stopGame(); this.remove(); });
+        this.appendChild(stopButton);
+        (_a = document.getElementById('menu-container')) === null || _a === void 0 ? void 0 : _a.appendChild(this);
+    }
+}
+window.customElements.define("finish-component", Finish);
 class Instructions extends HTMLElement {
     constructor() {
         var _a;
@@ -462,6 +498,10 @@ class Main {
     showCredits() {
         this.credits = new Credits();
     }
+    showFinish() {
+        this.audioPlayer.fadeOut();
+        this.finish = new Finish();
+    }
     pauseGame() {
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
@@ -503,6 +543,12 @@ class Main {
             for (const otherBullet of this.bullets) {
                 if (bullet !== otherBullet) {
                     if (bullet.hasCollision(this.bar)) {
+                        if (this.notes[this.notes.length - 1].time === bullet.time) {
+                            setTimeout(() => {
+                                console.log(this.notes[this.notes.length - 1].time, bullet.time);
+                                this.showFinish();
+                            }, 2000);
+                        }
                         if (!this.pitchdetect.active) {
                             this.pitchdetect.activate();
                         }

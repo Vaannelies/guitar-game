@@ -4,6 +4,8 @@ class AudioPlayer extends HTMLElement {
     constructor() {
         super()
         this.audio = new Audio('./audio/perfect.mp3');
+        this.audio.setAttribute('id', 'audio');
+        console.log(this.audio)
     }
     
     public play() {
@@ -11,7 +13,6 @@ class AudioPlayer extends HTMLElement {
 
         if(startPlayPromise !== undefined) {
            startPlayPromise.then(() => {
-               // toppie
            }).catch(error => {
                if(error.name === 'NotAllowedError') {
                    this.play();
@@ -29,6 +30,23 @@ class AudioPlayer extends HTMLElement {
     public stop() {
         this.audio.pause();
         this.audio.currentTime = 0;
+    }
+    public fadeOut() {
+        setTimeout(() => {
+            this.audio.volume = 0.8;
+            setTimeout(() => {
+                this.audio.volume = 0.6;
+                setTimeout(() => {
+                    this.audio.volume = 0.4;
+                    setTimeout(() => {
+                        this.audio.volume = 0.2;
+                        setTimeout(() => {
+                            this.audio.volume = 0.0;
+                        }, 300);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }, 300);
     }
 }
 

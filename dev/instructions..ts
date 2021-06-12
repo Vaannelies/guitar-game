@@ -15,7 +15,6 @@ class Instructions extends HTMLElement {
         const button = document.createElement('button')
         button.setAttribute('class', 'back')
         button.innerText = "BACK"
-        // stopButton.setAttribute('class', 'button --pauseMenu')
         button.addEventListener('click', ()=>{this.main.createMenu(); this.remove();})
         this.appendChild(button)
         
