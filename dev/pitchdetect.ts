@@ -186,9 +186,6 @@ class PitchDetect extends  HTMLElement {
                 this.octave = this.octaveFromNote(this.note)
                 this.outputNote = this.noteToOutputNote(this.note, this.octave)
                 this.detune= this.centsOffFromPitch( this.pitch, this.note );
-                if (this.detune == 0 ) {
-                    console.log('perfect!')
-                }
             }
             this.activeTime++
             setTimeout(() => {this.updatePitch()}, 19);
