@@ -2,7 +2,6 @@
 /// <reference path="pitchdetect.ts"/>
 
 class Main {
-    // const Stopwatch = requestAnimationFrame()
     public  audioPlayer: AudioPlayer
     private bullets : Bullet[] = []
     private timer: Timer
@@ -96,7 +95,6 @@ class Main {
             menu.remove();
             this.showCredits();
         })
-        
     }
     
     async start() {
@@ -157,7 +155,6 @@ class Main {
     }
 
     stopGame() {
-        console.log('hoi')
         this.points = 0;
         this.isPaused = false;
         this.bullets.forEach(bullet => {
@@ -186,7 +183,6 @@ class Main {
                         if(this.notes[this.notes.length-1].time === bullet.time && bullet.pointWasGiven && this.gameIsActive) {
                             this.gameIsActive = false
                             setTimeout(() => {
-                                console.log(this.notes[this.notes.length-1].time, bullet.time)
                                 this.showFinish()
                             }, 2000);
                         } 
@@ -238,7 +234,6 @@ class Main {
             requestAnimationFrame(() => this.gameLoop())
         }
     }
-
 }
 
 window.addEventListener("load", () => Main.getInstance())
