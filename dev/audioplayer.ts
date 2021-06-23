@@ -5,7 +5,6 @@ class AudioPlayer extends HTMLElement {
         super()
         this.audio = new Audio('./audio/perfect.mp3');
         this.audio.setAttribute('id', 'audio');
-        console.log(this.audio)
     }
     
     public play() {

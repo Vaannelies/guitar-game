@@ -3,7 +3,7 @@ class GameObject extends HTMLElement {
     constructor() {
         super();
         this.rotation = 0;
-        this.colors = ["Green", "Blue", "Orange", "White", "Black", "Red"];
+
         this._color = "";
         this._position = new Vector(Math.random() * window.innerWidth - this.clientWidth, Math.random() * window.innerHeight - this.clientHeight);
         this.speed = new Vector(2, 4);

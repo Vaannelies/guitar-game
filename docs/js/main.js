@@ -13,7 +13,6 @@ class AudioPlayer extends HTMLElement {
         super();
         this.audio = new Audio('./audio/perfect.mp3');
         this.audio.setAttribute('id', 'audio');
-        console.log(this.audio);
     }
     play() {
         const startPlayPromise = this.audio.play();
@@ -257,7 +256,6 @@ class PitchDetect extends HTMLElement {
         this.active = false;
         this.updatePitch();
         this.toggleLiveInput();
-        console.log("liveinput)");
     }
     activate() {
         this.activeTime = 0;
@@ -276,7 +274,6 @@ class PitchDetect extends HTMLElement {
                         (navigator === null || navigator === void 0 ? void 0 : navigator.mediaDevices.mozGetUserMedia);
                 yield navigator.mediaDevices.getUserMedia(dictionary)
                     .then((res) => {
-                    console.log(res);
                     this.gotStream(res);
                 });
             }
@@ -295,7 +292,6 @@ class PitchDetect extends HTMLElement {
     }
     toggleLiveInput() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("toggle");
             if (this.isPlaying) {
                 this.sourceNode.stop(0);
                 this.sourceNode = null;
@@ -398,9 +394,6 @@ class PitchDetect extends HTMLElement {
                 this.octave = this.octaveFromNote(this.note);
                 this.outputNote = this.noteToOutputNote(this.note, this.octave);
                 this.detune = this.centsOffFromPitch(this.pitch, this.note);
-                if (this.detune == 0) {
-                    console.log('perfect!');
-                }
             }
             this.activeTime++;
             setTimeout(() => { this.updatePitch(); }, 19);
@@ -530,7 +523,6 @@ class Main {
         }
     }
     stopGame() {
-        console.log('hoi');
         this.points = 0;
         this.isPaused = false;
         this.bullets.forEach(bullet => {
@@ -559,7 +551,6 @@ class Main {
                         if (this.notes[this.notes.length - 1].time === bullet.time && bullet.pointWasGiven && this.gameIsActive) {
                             this.gameIsActive = false;
                             setTimeout(() => {
-                                console.log(this.notes[this.notes.length - 1].time, bullet.time);
                                 this.showFinish();
                             }, 2000);
                         }
