@@ -286,7 +286,7 @@ class PitchDetect extends HTMLElement {
         var _a, _b;
         this.mediaStreamSource = (_a = this.audioContext) === null || _a === void 0 ? void 0 : _a.createMediaStreamSource(stream);
         this.analyser = (_b = this.audioContext) === null || _b === void 0 ? void 0 : _b.createAnalyser();
-        this.analyser.fftSize = 2048;
+        this.analyser.fftSize = 4096;
         this.mediaStreamSource.connect(this.analyser);
         this.updatePitch();
     }
@@ -394,6 +394,24 @@ class PitchDetect extends HTMLElement {
                 this.octave = this.octaveFromNote(this.note);
                 this.outputNote = this.noteToOutputNote(this.note, this.octave);
                 this.detune = this.centsOffFromPitch(this.pitch, this.note);
+            }
+            if (this.analyser) {
+                let noteArray = [];
+                let frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+                this.analyser.getByteFrequencyData(frequencyData);
+                frequencyData.forEach(frequency => {
+                    if (frequency > 220) {
+                        this.pitch = frequencyData.indexOf(frequency);
+                        this.note = this.noteFromPitch(this.pitch);
+                        this.octave = this.octaveFromNote(this.note);
+                        this.outputNote = this.noteToOutputNote(this.note, this.octave);
+                        this.detune = this.centsOffFromPitch(this.pitch, this.note);
+                        if (!(noteArray.indexOf(this.outputNote) >= 0)) {
+                            noteArray.push(this.outputNote);
+                        }
+                    }
+                });
+                console.log('noteArray', noteArray);
             }
             this.activeTime++;
             setTimeout(() => { this.updatePitch(); }, 19);

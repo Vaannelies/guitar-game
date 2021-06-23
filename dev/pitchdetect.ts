@@ -68,7 +68,7 @@ class PitchDetect extends  HTMLElement {
 
         // Connect it to the destination.
         this.analyser = this.audioContext?.createAnalyser();
-        this.analyser.fftSize = 2048;
+        this.analyser.fftSize = 4096;
         this.mediaStreamSource.connect(this.analyser );
         this.updatePitch();
     }
@@ -172,25 +172,72 @@ class PitchDetect extends  HTMLElement {
     }
 
     public updatePitch() {
+
+    // let  audioCtx = new AudioContext();
+    //   let  analyser = audioCtx.createAnalyser();
+    //  let   source = audioCtx.createMediaElementSource(this.audioContext);
+        // source.connect(analyser);
+        // analyser.connect(audioCtx.destination);
+
         // let cycles: any = new Array;
         if(this.active && this.activeTime < 10) {
             if(this.analyser) {
                 this.analyser.getFloatTimeDomainData( this.buf );
             }
+            // console.log('ac', this.buf )
             let ac: any = this.autoCorrelate(this.buf, this.audioContext?.sampleRate );
             if (ac == -1) {
                 this.note = null;
             } else {
                 this.pitch = ac;
+                // console.log('pitch1', this.pitch)
                 this.note = this.noteFromPitch( this.pitch );
+                // console.log('note1', this.note)
                 this.octave = this.octaveFromNote(this.note)
                 this.outputNote = this.noteToOutputNote(this.note, this.octave)
                 this.detune= this.centsOffFromPitch( this.pitch, this.note );
+            }
+
+            if(this.analyser) {  
+                // this.analyser.fftSize = 128;
+                let noteArray: string[] = []
+      
+              let frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+              this.analyser.getByteFrequencyData(frequencyData)
+
+                //   console.log('frequencydata', frequencyData )
+                  frequencyData.forEach(frequency => {
+                      if(frequency > 220) {
+                        // let ac: any = this.autoCorrelate(this.buf, frequency );
+                        // if (ac == -1) {
+                        //     this.note = null;
+                        // } else {
+                            // console.log('value', frequencyData.indexOf(frequency), frequency)
+                            this.pitch = frequencyData.indexOf(frequency)
+                            this.note = this.noteFromPitch( this.pitch );
+                            // console.log('note', this.note)
+                            this.octave = this.octaveFromNote(this.note)
+                            this.outputNote = this.noteToOutputNote(this.note, this.octave)
+                            this.detune= this.centsOffFromPitch( this.pitch, this.note );
+
+                            // console.log('frequency note', this.outputNote)
+                            if(!(noteArray.indexOf(this.outputNote) >= 0)) {
+                                noteArray.push(this.outputNote);
+                            }
+                        // }
+                      
+
+                      }
+                  })
+
+                  console.log('noteArray', noteArray)
+              
             }
             this.activeTime++
             setTimeout(() => {this.updatePitch()}, 19);
         }
     }
+
 }
 
 window.customElements.define("pitchdetect-component", (PitchDetect as any))
