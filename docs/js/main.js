@@ -311,7 +311,7 @@ class PitchDetect extends HTMLElement {
             });
         });
     }
-    noteToOutputNote(note, octave) {
+    noteToOutputNote(note) {
         const noteString = this.noteStrings[note % 12];
         if (this.noteStrings[note % 12].indexOf("#") !== -1) {
             return noteString + this.octave;
@@ -354,7 +354,9 @@ class PitchDetect extends HTMLElement {
                 r2 = SIZE - i;
                 break;
             }
+        console.log('buf', buf);
         buf = buf.slice(r1, r2);
+        console.log('bufafterslice', buf);
         SIZE = buf.length;
         var c = new Array(SIZE).fill(0);
         for (var i = 0; i < SIZE; i++)
@@ -378,6 +380,61 @@ class PitchDetect extends HTMLElement {
             T0 = T0 - b / (2 * a);
         return sampleRate / T0;
     }
+    autoCorrelateTwo(buf, sampleRate) {
+        var SIZE = buf.length;
+        var rms = 0;
+        for (var i = 0; i < SIZE; i++) {
+            var val = buf[i];
+            rms += val * val;
+        }
+        rms = Math.sqrt(rms / SIZE);
+        if (rms < 0.01)
+            return -1;
+        var r1 = 0, r2 = SIZE - 1, thres = 0.2;
+        for (var i = 0; i < SIZE / 2; i++)
+            if (Math.abs(buf[i]) < thres) {
+                r1 = i;
+                break;
+            }
+        for (var i = 1; i < SIZE / 2; i++)
+            if (Math.abs(buf[SIZE - i]) < thres) {
+                r2 = SIZE - i;
+                break;
+            }
+        buf = buf.slice(r1, r2);
+        SIZE = buf.length;
+        var c = new Array(SIZE).fill(0);
+        for (var i = 0; i < SIZE; i++)
+            for (var j = 0; j < SIZE - i; j++)
+                c[i] = c[i] + buf[j] * buf[j + i];
+        var d = 0;
+        while (c[d] > c[d + 1])
+            d++;
+        var maxval = [-1], maxpos = [-1];
+        for (var i = d; i < SIZE; i++) {
+            if (c[i] > maxval) {
+                maxval.push(c[i]);
+            }
+        }
+        maxval.sort();
+        maxval = [maxval[maxval.length - 1], maxval[maxval.length - 2], maxval[maxval.length - 3], maxval[maxval.length - 4]];
+        console.log('maxval', maxval);
+        maxpos = [];
+        console.log('buf', buf);
+        maxval.forEach(val => {
+            maxpos.push(buf.indexOf(val));
+        });
+        var returnValues = [];
+        maxpos.forEach(T0 => {
+            var x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+            let a = (x1 + x3 - 2 * x2) / 2;
+            let b = (x3 - x1) / 2;
+            if (a)
+                T0 = T0 - b / (2 * a);
+            returnValues.push(sampleRate / T0);
+        });
+        return returnValues;
+    }
     updatePitch() {
         var _a;
         if (this.active && this.activeTime < 10) {
@@ -390,21 +447,68 @@ class PitchDetect extends HTMLElement {
             }
             else {
                 this.pitch = ac;
+                console.log('pitch1', this.pitch);
                 this.note = this.noteFromPitch(this.pitch);
                 this.octave = this.octaveFromNote(this.note);
-                this.outputNote = this.noteToOutputNote(this.note, this.octave);
+                this.outputNote = this.noteToOutputNote(this.note);
                 this.detune = this.centsOffFromPitch(this.pitch, this.note);
             }
             if (this.analyser) {
                 let noteArray = [];
-                let frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
-                this.analyser.getByteFrequencyData(frequencyData);
+                let frequencyData = new Float32Array(this.analyser.frequencyBinCount);
+                this.analyser.getFloatTimeDomainData(frequencyData);
+                var SIZE = frequencyData.length;
+                var rms = 0;
+                for (var i = 0; i < SIZE; i++) {
+                    var val = frequencyData[i];
+                    rms += val * val;
+                }
+                rms = Math.sqrt(rms / SIZE);
+                if (rms < 0.01)
+                    return -1;
+                var r1 = 0, r2 = SIZE - 1, thres = 0.2;
+                for (var i = 0; i < SIZE / 2; i++)
+                    if (Math.abs(frequencyData[i]) < thres) {
+                        r1 = i;
+                        break;
+                    }
+                for (var i = 1; i < SIZE / 2; i++)
+                    if (Math.abs(frequencyData[SIZE - i]) < thres) {
+                        r2 = SIZE - i;
+                        break;
+                    }
+                frequencyData = frequencyData.slice(r1, r2);
+                console.log('frequencydata', frequencyData);
+                var c = new Array(SIZE).fill(0);
+                for (var i = 0; i < SIZE; i++)
+                    for (var j = 0; j < SIZE - i; j++)
+                        c[i] = c[i] + frequencyData[j] * frequencyData[j + i];
+                var d = 0;
+                while (c[d] > c[d + 1])
+                    d++;
+                var maxval = -1, maxpos = -1;
+                for (var i = d; i < SIZE; i++) {
+                    if (c[i] > maxval) {
+                        maxval = c[i];
+                        maxpos = i;
+                    }
+                }
                 frequencyData.forEach(frequency => {
-                    if (frequency > 220) {
-                        this.pitch = frequencyData.indexOf(frequency);
+                    if (frequency > 0.1) {
+                        var T0 = frequencyData.indexOf(frequency);
+                        var x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+                        let a = (x1 + x3 - 2 * x2) / 2;
+                        let b = (x3 - x1) / 2;
+                        if (a)
+                            T0 = T0 - b / (2 * a);
+                        console.log('value', frequencyData.indexOf(frequency), frequency);
+                        if (this.audioContext) {
+                            this.pitch = this.audioContext.sampleRate / T0;
+                        }
+                        console.log('pitch2', this.pitch);
                         this.note = this.noteFromPitch(this.pitch);
                         this.octave = this.octaveFromNote(this.note);
-                        this.outputNote = this.noteToOutputNote(this.note, this.octave);
+                        this.outputNote = this.noteToOutputNote(this.note);
                         this.detune = this.centsOffFromPitch(this.pitch, this.note);
                         if (!(noteArray.indexOf(this.outputNote) >= 0)) {
                             noteArray.push(this.outputNote);
@@ -412,10 +516,30 @@ class PitchDetect extends HTMLElement {
                     }
                 });
                 console.log('noteArray', noteArray);
+                if ((noteArray.indexOf("D0") >= 0) && (noteArray.indexOf("F#0") >= 0) && (noteArray.indexOf("A0") >= 0)) {
+                    console.log("D chord");
+                }
             }
+            this.analyser.fftSize = 32;
+            let frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+            this.renderFrame(frequencyData);
             this.activeTime++;
             setTimeout(() => { this.updatePitch(); }, 19);
         }
+    }
+    renderFrame(frequencyData) {
+        this.analyser.getByteFrequencyData(frequencyData);
+        console.log("0", (frequencyData[0] * 100) / 256);
+        console.log("1", (frequencyData[1] * 100) / 256);
+        console.log("2", (frequencyData[2] * 100) / 256);
+        console.log("3", (frequencyData[3] * 100) / 256);
+        console.log("4", (frequencyData[4] * 100) / 256);
+        console.log("5", (frequencyData[5] * 100) / 256);
+        console.log("6", (frequencyData[6] * 100) / 256);
+        console.log("7", (frequencyData[7] * 100) / 256);
+        console.log("8", (frequencyData[8] * 100) / 256);
+        console.log(frequencyData);
+        requestAnimationFrame(this.renderFrame);
     }
 }
 window.customElements.define("pitchdetect-component", PitchDetect);
